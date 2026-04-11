@@ -1,20 +1,20 @@
-# Modo: pdf — Generación de PDF ATS-Optimizado
+# Mode: pdf — ATS-Optimized PDF Generation
 
-## Pipeline completo
+## Full pipeline
 
-1. Lee `cv.md` como fuentes de verdad
-2. Pide al usuario el JD si no está en contexto (texto o URL)
-3. Extrae 15-20 keywords del JD
-4. Detecta idioma del JD → idioma del CV (EN default)
-5. Detecta ubicación empresa → formato papel:
+1. Read `cv.md` as source of truth
+2. Ask the user for the JD if not in context (text or URL)
+3. Extract 15-20 keywords from the JD
+4. Detect JD language → CV language (EN default)
+5. Detect company location → paper format:
    - US/Canada → `letter`
-   - Resto del mundo → `a4`
-6. Detecta arquetipo del rol → adapta framing
-7. Reescribe Professional Summary inyectando keywords del JD + exit narrative bridge ("Built and sold a business. Now applying systems thinking to [domain del JD].")
-8. Selecciona top 3-4 proyectos más relevantes para la oferta
-9. Reordena bullets de experiencia por relevancia al JD
-10. Construye competency grid desde requisitos del JD (6-8 keyword phrases)
-11. Inyecta keywords naturalmente en logros existentes (NUNCA inventa)
+   - Rest of world → `a4`
+6. Detect role archetype → adapt framing
+7. Rewrite Professional Summary injecting JD keywords + exit narrative bridge ("Built and sold a business. Now applying systems thinking to [JD domain].")
+8. Select top 3-4 projects most relevant to the offer
+9. Reorder experience bullets by JD relevance
+10. Build competency grid from JD requirements (6-8 keyword phrases)
+11. Inject keywords naturally into existing achievements (NEVER invent)
 12. Genera HTML completo desde template + contenido personalizado
 13. Lee `name` de `config/profile.yml` → normaliza a kebab-case lowercase (e.g. "John Doe" → "john-doe") → `{candidate}`
 14. Escribe HTML a `/tmp/cv-{candidate}-{company}.html`
@@ -174,6 +174,6 @@ d. Report: PDF path, file size, Canva design URL (for manual tweaking)
 - If `find_and_replace_text` finds no matches → try broader substring matching
 - Always provide the Canva design URL so the user can edit manually if auto-edit fails
 
-## Post-generación
+## Post-generation
 
-Actualizar tracker si la oferta ya está registrada: cambiar PDF de ❌ a ✅.
+Update tracker if the offer is already registered: change PDF from ❌ to ✅.

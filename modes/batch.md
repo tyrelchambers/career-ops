@@ -1,6 +1,6 @@
-# Modo: batch — Procesamiento Masivo de Ofertas
+# Mode: batch — Bulk Offer Processing
 
-Dos modos de uso: **conductor --chrome** (navega portales en tiempo real) o **standalone** (script para URLs ya recolectadas).
+Two usage modes: **conductor --chrome** (navigates portals in real time) or **standalone** (script for already-collected URLs).
 
 ## Arquitectura
 
@@ -46,13 +46,13 @@ batch/
       ```bash
       claude -p --dangerously-skip-permissions \
         --append-system-prompt-file batch/batch-prompt.md \
-        "Procesa esta oferta. URL: {url}. JD: /tmp/batch-jd-{id}.txt. Report: {num}. ID: {id}"
+        "Process this offer. URL: {url}. JD: /tmp/batch-jd-{id}.txt. Report: {num}. ID: {id}"
       ```
    e. Actualizar `batch-state.tsv` (completed/failed + score + report_num)
    f. Log a `logs/{report_num}-{id}.log`
    g. Chrome: volver atrás → siguiente oferta
-5. **Paginación**: Si no hay más ofertas → click "Next" → repetir
-6. **Fin**: Merge `tracker-additions/` → `applications.md` + resumen
+5. **Pagination**: If no more offers → click "Next" → repeat
+6. **Done**: Merge `tracker-additions/` → `applications.md` + summary
 
 ## Modo B: Script standalone
 

@@ -33,14 +33,15 @@
 
 ## Diseño del PDF
 
-- **Fonts**: Space Grotesk (headings, 600-700) + DM Sans (body, 400-500)
-- **Fonts self-hosted**: `fonts/`
-- **Header**: nombre en Space Grotesk 24px bold + línea gradiente `linear-gradient(to right, hsl(187,74%,32%), hsl(270,70%,45%))` 2px + fila de contacto
-- **Section headers**: Space Grotesk 13px, uppercase, letter-spacing 0.05em, color cyan primary
-- **Body**: DM Sans 11px, line-height 1.5
-- **Company names**: color accent purple `hsl(270,70%,45%)`
+- **Fonts**: Arial / Helvetica (system sans-serif), no custom fonts
+- **Header**: name in 28px bold black + contact row (no gradient line)
+- **Section headers**: 12px uppercase bold black, 1px solid black underline
+- **Body**: 11px, line-height 1.5, black text
+- **Company names**: bold black (no accent color)
+- **Competency tags**: plain text, no background/border/padding
 - **Márgenes**: 0.6in
-- **Background**: blanco puro
+- **Background**: white
+- **Colors**: all text is black (#000) or near-black (#333) — no decorative colors
 
 ## Orden de secciones (optimizado "6-second recruiter scan")
 

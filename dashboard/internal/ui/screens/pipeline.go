@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 
+	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
@@ -42,11 +44,20 @@ type PipelineUpdateStatusMsg struct {
 	NewStatus     string
 }
 
-// PipelineRefreshMsg requests a full tracker reload from disk.
+// PipelineOpenTasksMsg is emitted when the user wants to view the tasks list.
+type PipelineOpenTasksMsg struct{}
+
+// PipelineRefreshMsg is emitted when the user requests a data refresh.
 type PipelineRefreshMsg struct{}
 
 // PipelineOpenProgressMsg is emitted when the progress screen should open.
 type PipelineOpenProgressMsg struct{}
+
+// PipelineBatchEvalMsg is emitted to batch-evaluate multiple pending offers.
+type PipelineBatchEvalMsg struct {
+	Apps          []model.CareerApplication
+	CareerOpsPath string
+}
 
 type reportSummary struct {
 	archetype string
@@ -65,6 +76,7 @@ const (
 
 // Filter modes
 const (
+	filterPending   = "pending"
 	filterAll       = "all"
 	filterEvaluated = "evaluated"
 	filterApplied   = "applied"
@@ -81,6 +93,7 @@ type pipelineTab struct {
 }
 
 var pipelineTabs = []pipelineTab{
+	{filterPending, "PENDING"},
 	{filterAll, "ALL"},
 	{filterEvaluated, "EVALUATED"},
 	{filterApplied, "APPLIED"},
@@ -96,11 +109,12 @@ var sortCycle = []string{sortScore, sortDate, sortCompany, sortStatus}
 var statusOptions = []string{"Evaluated", "Applied", "Responded", "Interview", "Offer", "Rejected", "Discarded", "SKIP"}
 
 // statusGroupOrder defines display order for grouped view.
-var statusGroupOrder = []string{"interview", "offer", "responded", "applied", "evaluated", "skip", "rejected", "discarded"}
+var statusGroupOrder = []string{"pending", "interview", "offer", "responded", "applied", "evaluated", "skip", "rejected", "discarded"}
 
 // PipelineModel implements the career pipeline dashboard screen.
 type PipelineModel struct {
 	apps          []model.CareerApplication
+	pendingOffers []model.CareerApplication
 	filtered      []model.CareerApplication
 	metrics       model.PipelineMetrics
 	cursor        int
@@ -115,12 +129,24 @@ type PipelineModel struct {
 	// Status picker sub-state
 	statusPicker bool
 	statusCursor int
+	// Action menu sub-state
+	actionMenu     bool
+	actionCursor   int
+	actionCategory int // 0=Claude CLI, 1=Scripts
+	// Batch evaluate input
+	batchInputActive bool
+	batchInput       textinput.Model
+	// Pending offer status tracking (JobURL → "Evaluating", "Done", "Failed", "Cancelled")
+	pendingStatus map[string]string
+	// Background tasks
+	runningTasks int
 }
 
 // NewPipelineModel creates a new pipeline screen.
-func NewPipelineModel(t theme.Theme, apps []model.CareerApplication, metrics model.PipelineMetrics, careerOpsPath string, width, height int) PipelineModel {
+func NewPipelineModel(t theme.Theme, apps []model.CareerApplication, pending []model.CareerApplication, metrics model.PipelineMetrics, careerOpsPath string, width, height int) PipelineModel {
 	m := PipelineModel{
 		apps:          apps,
+		pendingOffers: pending,
 		metrics:       metrics,
 		sortMode:      sortScore,
 		activeTab:     0,
@@ -130,6 +156,7 @@ func NewPipelineModel(t theme.Theme, apps []model.CareerApplication, metrics mod
 		theme:         t,
 		careerOpsPath: careerOpsPath,
 		reportCache:   make(map[string]reportSummary),
+		pendingStatus: make(map[string]string),
 	}
 	m.applyFilterAndSort()
 	return m
@@ -159,6 +186,33 @@ func (m *PipelineModel) CopyReportCache(other *PipelineModel) {
 	}
 }
 
+// CopyViewState preserves navigation state from another pipeline model across reloads.
+func (m *PipelineModel) CopyViewState(other *PipelineModel) {
+	m.activeTab = other.activeTab
+	m.sortMode = other.sortMode
+	m.viewMode = other.viewMode
+	// Preserve pending status tracking
+	for k, v := range other.pendingStatus {
+		m.pendingStatus[k] = v
+	}
+	// Re-apply filter with preserved tab
+	m.applyFilterAndSort()
+	// Clamp cursor to new filtered length
+	m.cursor = other.cursor
+	if m.cursor >= len(m.filtered) {
+		m.cursor = len(m.filtered) - 1
+	}
+	if m.cursor < 0 {
+		m.cursor = 0
+	}
+	m.scrollOffset = other.scrollOffset
+}
+
+// SetPendingStatus updates the realtime status of a pending offer by JobURL.
+func (m *PipelineModel) SetPendingStatus(jobURL, status string) {
+	m.pendingStatus[jobURL] = status
+}
+
 // EnrichReport caches report summary data for preview.
 func (m *PipelineModel) EnrichReport(reportPath, archetype, tldr, remote, comp string) {
 	m.reportCache[reportPath] = reportSummary{
@@ -169,51 +223,9 @@ func (m *PipelineModel) EnrichReport(reportPath, archetype, tldr, remote, comp s
 	}
 }
 
-// WithReloadedData rebuilds the pipeline with fresh tracker data while preserving
-// the current UI state so manual refresh feels seamless.
-func (m PipelineModel) WithReloadedData(apps []model.CareerApplication, metrics model.PipelineMetrics) PipelineModel {
-	selectedReportPath := ""
-	selectedCompany := ""
-	selectedRole := ""
-	if app, ok := m.CurrentApp(); ok {
-		selectedReportPath = app.ReportPath
-		selectedCompany = app.Company
-		selectedRole = app.Role
-	}
-
-	reloaded := NewPipelineModel(m.theme, apps, metrics, m.careerOpsPath, m.width, m.height)
-	reloaded.sortMode = m.sortMode
-	reloaded.activeTab = m.activeTab
-	reloaded.viewMode = m.viewMode
-	reloaded.applyFilterAndSort()
-	reloaded.CopyReportCache(&m)
-
-	for i, app := range reloaded.filtered {
-		if selectedReportPath != "" && app.ReportPath == selectedReportPath {
-			reloaded.cursor = i
-			reloaded.adjustScroll()
-			return reloaded
-		}
-		if selectedReportPath == "" && app.Company == selectedCompany && app.Role == selectedRole {
-			reloaded.cursor = i
-			reloaded.adjustScroll()
-			return reloaded
-		}
-	}
-
-	if len(reloaded.filtered) == 0 {
-		reloaded.cursor = 0
-		reloaded.scrollOffset = 0
-		return reloaded
-	}
-
-	if m.cursor >= len(reloaded.filtered) {
-		reloaded.cursor = len(reloaded.filtered) - 1
-	} else if m.cursor > 0 {
-		reloaded.cursor = m.cursor
-	}
-	reloaded.adjustScroll()
-	return reloaded
+// SetRunningTasks updates the running task count displayed in the header.
+func (m *PipelineModel) SetRunningTasks(count int) {
+	m.runningTasks = count
 }
 
 // CurrentApp returns the currently selected application, if any.
@@ -224,10 +236,20 @@ func (m PipelineModel) CurrentApp() (model.CareerApplication, bool) {
 	return m.filtered[m.cursor], true
 }
 
+func (m PipelineModel) isOnPendingTab() bool {
+	return m.activeTab >= 0 && m.activeTab < len(pipelineTabs) && pipelineTabs[m.activeTab].filter == filterPending
+}
+
 // Update handles input for the pipeline screen.
 func (m PipelineModel) Update(msg tea.Msg) (PipelineModel, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
+		if m.batchInputActive {
+			return m.handleBatchInput(msg)
+		}
+		if m.actionMenu {
+			return m.handleActionMenu(msg)
+		}
 		if m.statusPicker {
 			return m.handleStatusPicker(msg)
 		}
@@ -322,6 +344,44 @@ func (m PipelineModel) handleKey(msg tea.KeyMsg) (PipelineModel, tea.Cmd) {
 	case "p":
 		return m, func() tea.Msg { return PipelineOpenProgressMsg{} }
 
+	case "a":
+		// On PENDING tab, 'a' directly evaluates the selected offer
+		if m.isOnPendingTab() {
+			if app, ok := m.CurrentApp(); ok && app.JobURL != "" {
+				evalAction := ActionItem{Label: "Evaluate", Category: "claude", Command: "evaluate", NeedsApp: true}
+				appCopy := app
+				return m, func() tea.Msg {
+					return PipelineRunActionMsg{Action: evalAction, App: &appCopy, CareerOpsPath: m.careerOpsPath}
+				}
+			}
+			return m, nil
+		}
+		m.actionMenu = true
+		m.actionCursor = 0
+		m.actionCategory = 0
+
+	case "A":
+		// Shift-A always opens action menu (useful on PENDING tab)
+		m.actionMenu = true
+		m.actionCursor = 0
+		m.actionCategory = 0
+
+	case "e":
+		// Batch evaluate from cursor position (only on PENDING tab)
+		if m.isOnPendingTab() && len(m.filtered) > 0 {
+			ti := textinput.New()
+			ti.Placeholder = "number or ALL"
+			ti.CharLimit = 5
+			ti.Width = 20
+			ti.Focus()
+			m.batchInput = ti
+			m.batchInputActive = true
+			return m, textinput.Blink
+		}
+
+	case "t":
+		return m, func() tea.Msg { return PipelineOpenTasksMsg{} }
+
 	case "r":
 		return m, func() tea.Msg { return PipelineRefreshMsg{} }
 
@@ -411,6 +471,107 @@ func (m PipelineModel) handleStatusPicker(msg tea.KeyMsg) (PipelineModel, tea.Cm
 	return m, nil
 }
 
+func (m PipelineModel) handleActionMenu(msg tea.KeyMsg) (PipelineModel, tea.Cmd) {
+	actions := actionsForCategory(m.actionCategory)
+	switch msg.String() {
+	case "esc", "q":
+		m.actionMenu = false
+		return m, nil
+
+	case "tab", "right", "left":
+		m.actionCategory = (m.actionCategory + 1) % len(actionCategories)
+		m.actionCursor = 0
+
+	case "down":
+		m.actionCursor++
+		if m.actionCursor >= len(actions) {
+			m.actionCursor = len(actions) - 1
+		}
+
+	case "up":
+		m.actionCursor--
+		if m.actionCursor < 0 {
+			m.actionCursor = 0
+		}
+
+	case "enter":
+		if len(actions) == 0 {
+			return m, nil
+		}
+		action := actions[m.actionCursor]
+		_, hasApp := m.CurrentApp()
+		if action.NeedsApp && !hasApp {
+			return m, nil
+		}
+		m.actionMenu = false
+		var app *model.CareerApplication
+		if a, ok := m.CurrentApp(); ok {
+			app = &a
+		}
+		return m, func() tea.Msg {
+			return PipelineRunActionMsg{Action: action, App: app, CareerOpsPath: m.careerOpsPath}
+		}
+	}
+	return m, nil
+}
+
+func (m PipelineModel) handleBatchInput(msg tea.KeyMsg) (PipelineModel, tea.Cmd) {
+	switch msg.String() {
+	case "esc":
+		m.batchInputActive = false
+		return m, nil
+
+	case "enter":
+		m.batchInputActive = false
+		val := strings.TrimSpace(m.batchInput.Value())
+		if val == "" {
+			return m, nil
+		}
+
+		// Determine how many offers to evaluate from cursor position
+		remaining := len(m.filtered) - m.cursor
+		if remaining <= 0 {
+			return m, nil
+		}
+
+		var count int
+		if strings.EqualFold(val, "all") {
+			count = remaining
+		} else {
+			n, err := strconv.Atoi(val)
+			if err != nil || n <= 0 {
+				return m, nil
+			}
+			count = n
+			if count > remaining {
+				count = remaining
+			}
+		}
+
+		// Collect the apps to evaluate
+		apps := make([]model.CareerApplication, 0, count)
+		for i := 0; i < count; i++ {
+			app := m.filtered[m.cursor+i]
+			if app.JobURL != "" {
+				apps = append(apps, app)
+			}
+		}
+		if len(apps) == 0 {
+			return m, nil
+		}
+
+		return m, func() tea.Msg {
+			return PipelineBatchEvalMsg{Apps: apps, CareerOpsPath: m.careerOpsPath}
+		}
+
+	default:
+		// Forward to textinput
+		var cmd tea.Cmd
+		m.batchInput, cmd = m.batchInput.Update(msg)
+		return m, cmd
+	}
+}
+
 func (m PipelineModel) loadCurrentReport() tea.Cmd {
 	app, ok := m.CurrentApp()
 	if !ok || app.ReportPath == "" {
@@ -431,18 +592,23 @@ func (m *PipelineModel) applyFilterAndSort() {
 	var filtered []model.CareerApplication
 
 	currentFilter := pipelineTabs[m.activeTab].filter
-	for _, app := range m.apps {
-		norm := data.NormalizeStatus(app.Status)
-		switch currentFilter {
-		case filterAll:
-			filtered = append(filtered, app)
-		case filterTop:
-			if app.Score >= 4.0 && norm != "skip" {
+
+	if currentFilter == filterPending {
+		filtered = append(filtered, m.pendingOffers...)
+	} else {
+		for _, app := range m.apps {
+			norm := data.NormalizeStatus(app.Status)
+			switch currentFilter {
+			case filterAll:
 				filtered = append(filtered, app)
-			}
-		default:
-			if norm == currentFilter {
-				filtered = append(filtered, app)
+			case filterTop:
+				if app.Score >= 4.0 && norm != "skip" {
+					filtered = append(filtered, app)
+				}
+			default:
+				if norm == currentFilter {
+					filtered = append(filtered, app)
+				}
 			}
 		}
 	}
@@ -562,9 +728,18 @@ func (m PipelineModel) View() string {
 	}
 	body = strings.Join(bodyLines, "\n")
 
+	// Batch input overlay
+	if m.batchInputActive {
+		body = m.overlayBatchInput(body)
+	}
 	// Status picker overlay
 	if m.statusPicker {
 		body = m.overlayStatusPicker(body)
+	}
+	// Action menu overlay — renders as full-screen centered box
+	if m.actionMenu {
+		_, hasApp := m.CurrentApp()
+		return overlayActionMenu(m.actionCategory, m.actionCursor, m.width, m.height, hasApp, m.theme)
 	}
 
 	return lipgloss.JoinVertical(lipgloss.Left,
@@ -632,6 +807,9 @@ func (m PipelineModel) renderTabs() string {
 }
 
 func (m PipelineModel) countForFilter(filter string) int {
+	if filter == filterPending {
+		return len(m.pendingOffers)
+	}
 	count := 0
 	for _, app := range m.apps {
 		norm := data.NormalizeStatus(app.Status)
@@ -747,8 +925,14 @@ func (m PipelineModel) renderAppLine(app model.CareerApplication, selected bool)
 	numStyle := lipgloss.NewStyle().Foreground(m.theme.Blue).Bold(true).Width(numW)
 
 	// Score with color
-	scoreStyle := m.scoreStyle(app.Score)
-	score := scoreStyle.Render(fmt.Sprintf("%.1f", app.Score))
+	isPending := data.NormalizeStatus(app.Status) == "pending"
+	var score string
+	if isPending {
+		score = lipgloss.NewStyle().Foreground(m.theme.Subtext).Render(" — ")
+	} else {
+		scoreStyle := m.scoreStyle(app.Score)
+		score = scoreStyle.Render(fmt.Sprintf("%.1f", app.Score))
+	}
 
 	// Company (truncate)
 	company := truncateRunes(app.Company, companyW)
@@ -767,9 +951,28 @@ func (m PipelineModel) renderAppLine(app model.CareerApplication, selected bool)
 
 	// Status with color -- fixed column
 	norm := data.NormalizeStatus(app.Status)
+	displayStatus := statusLabel(norm)
 	statusColor := m.statusColorMap()[norm]
+
+	// Override display for pending items with active eval status
+	if isPending {
+		if ps, ok := m.pendingStatus[app.JobURL]; ok {
+			displayStatus = ps
+			switch ps {
+			case "Evaluating":
+				statusColor = m.theme.Yellow
+			case "Done":
+				statusColor = m.theme.Green
+			case "Failed":
+				statusColor = m.theme.Red
+			case "Cancelled":
+				statusColor = m.theme.Subtext
+			}
+		}
+	}
+
 	statusStyle := lipgloss.NewStyle().Foreground(statusColor).Width(statusW)
-	statusText := statusStyle.Render(statusLabel(norm))
+	statusText := statusStyle.Render(displayStatus)
 
 	// Comp from report cache -- fixed column
 	compText := ""
@@ -814,6 +1017,21 @@ func (m PipelineModel) renderPreview() string {
 	valueStyle := lipgloss.NewStyle().Foreground(m.theme.Text)
 	dimStyle := lipgloss.NewStyle().Foreground(m.theme.Subtext)
 
+	// Pending items: show URL and action hint
+	if data.NormalizeStatus(app.Status) == "pending" {
+		if app.JobURL != "" {
+			lines = append(lines, padStyle.Render(
+				labelStyle.Render("URL: ")+valueStyle.Render(app.JobURL)))
+		}
+		lines = append(lines, padStyle.Render(
+			dimStyle.Render("Press ")+
+				labelStyle.Render("a")+
+				dimStyle.Render(" → Evaluate  |  ")+
+				labelStyle.Render("o")+
+				dimStyle.Render(" → Open in browser")))
+		return strings.Join(lines, "\n")
+	}
+
 	// Check report cache
 	if summary, ok := m.reportCache[app.ReportPath]; ok {
 		if summary.archetype != "" {
@@ -853,6 +1071,20 @@ func (m PipelineModel) renderHelp() string {
 	keyStyle := lipgloss.NewStyle().Bold(true).Foreground(m.theme.Text)
 	descStyle := lipgloss.NewStyle().Foreground(m.theme.Subtext)
 
+	if m.actionMenu {
+		return style.Render(
+			keyStyle.Render("↑↓") + descStyle.Render(" navigate  ") +
+				keyStyle.Render("Tab") + descStyle.Render(" category  ") +
+				keyStyle.Render("Enter") + descStyle.Render(" run  ") +
+				keyStyle.Render("Esc") + descStyle.Render(" close"))
+	}
+
+	if m.batchInputActive {
+		return style.Render(
+			keyStyle.Render("Enter") + descStyle.Render(" confirm  ") +
+				keyStyle.Render("Esc") + descStyle.Render(" cancel"))
+	}
+
 	if m.statusPicker {
 		return style.Render(
 			keyStyle.Render("↑↓/jk") + descStyle.Render(" navigate  ") +
@@ -862,16 +1094,39 @@ func (m PipelineModel) renderHelp() string {
 
 	brand := lipgloss.NewStyle().Foreground(m.theme.Overlay).Render("career-ops by santifer.io")
 
-	keys := keyStyle.Render("↑↓/jk") + descStyle.Render(" nav  ") +
-		keyStyle.Render("←→/hl") + descStyle.Render(" tabs  ") +
-		keyStyle.Render("s") + descStyle.Render(" sort  ") +
-		keyStyle.Render("r") + descStyle.Render(" refresh  ") +
-		keyStyle.Render("Enter") + descStyle.Render(" report  ") +
-		keyStyle.Render("o") + descStyle.Render(" open URL  ") +
-		keyStyle.Render("c") + descStyle.Render(" change  ") +
-		keyStyle.Render("v") + descStyle.Render(" view  ") +
-		keyStyle.Render("p") + descStyle.Render(" progress  ") +
-		keyStyle.Render("Esc") + descStyle.Render(" quit")
+	tasksKey := keyStyle.Render("t") + descStyle.Render(func() string {
+		if m.runningTasks > 0 {
+			return fmt.Sprintf(" tasks(%d)  ", m.runningTasks)
+		}
+		return " tasks  "
+	}())
+
+	var keys string
+	if m.isOnPendingTab() {
+		keys = keyStyle.Render("↑↓") + descStyle.Render(" nav  ") +
+			keyStyle.Render("←→") + descStyle.Render(" tabs  ") +
+			keyStyle.Render("a") + descStyle.Render(" evaluate  ") +
+			keyStyle.Render("e") + descStyle.Render(" batch eval  ") +
+			keyStyle.Render("o") + descStyle.Render(" open URL  ") +
+			keyStyle.Render("A") + descStyle.Render(" actions  ") +
+			tasksKey +
+			keyStyle.Render("p") + descStyle.Render(" progress  ") +
+			keyStyle.Render("r") + descStyle.Render(" refresh  ") +
+			keyStyle.Render("Esc") + descStyle.Render(" quit")
+	} else {
+		keys = keyStyle.Render("↑↓") + descStyle.Render(" nav  ") +
+			keyStyle.Render("←→") + descStyle.Render(" tabs  ") +
+			keyStyle.Render("s") + descStyle.Render(" sort  ") +
+			keyStyle.Render("Enter") + descStyle.Render(" report  ") +
+			keyStyle.Render("o") + descStyle.Render(" open URL  ") +
+			keyStyle.Render("a") + descStyle.Render(" actions  ") +
+			tasksKey +
+			keyStyle.Render("c") + descStyle.Render(" change  ") +
+			keyStyle.Render("v") + descStyle.Render(" view  ") +
+			keyStyle.Render("p") + descStyle.Render(" progress  ") +
+			keyStyle.Render("r") + descStyle.Render(" refresh  ") +
+			keyStyle.Render("Esc") + descStyle.Render(" quit")
+	}
 
 	gap := m.width - lipgloss.Width(keys) - lipgloss.Width(brand) - 2
 	if gap < 1 {
@@ -911,6 +1166,24 @@ func (m PipelineModel) overlayStatusPicker(body string) string {
 	return strings.Join(bodyLines, "\n")
 }
 
+func (m PipelineModel) overlayBatchInput(body string) string {
+	bodyLines := strings.Split(body, "\n")
+	padStyle := lipgloss.NewStyle().Padding(0, 2)
+	labelStyle := lipgloss.NewStyle().Foreground(m.theme.Blue).Bold(true)
+	hintStyle := lipgloss.NewStyle().Foreground(m.theme.Subtext)
+
+	remaining := len(m.filtered) - m.cursor
+	var lines []string
+	lines = append(lines, padStyle.Render(
+		labelStyle.Render("Batch evaluate: ")+
+			hintStyle.Render(fmt.Sprintf("(%d remaining from cursor)", remaining))))
+	lines = append(lines, padStyle.Render(
+		hintStyle.Render("Enter number or ALL: ")+m.batchInput.View()))
+
+	bodyLines = append(bodyLines, lines...)
+	return strings.Join(bodyLines, "\n")
+}
+
 // -- Helpers --
 
 func (m PipelineModel) scoreStyle(score float64) lipgloss.Style {
@@ -928,6 +1201,7 @@ func (m PipelineModel) scoreStyle(score float64) lipgloss.Style {
 
 func (m PipelineModel) statusColorMap() map[string]lipgloss.Color {
 	return map[string]lipgloss.Color{
+		"pending":   m.theme.Mauve,
 		"interview": m.theme.Green,
 		"offer":     m.theme.Green,
 		"applied":   m.theme.Sky,
@@ -963,6 +1237,8 @@ func truncateRunes(s string, maxRunes int) string {
 
 func statusLabel(norm string) string {
 	switch norm {
+	case "pending":
+		return "Pending"
 	case "interview":
 		return "Interview"
 	case "offer":

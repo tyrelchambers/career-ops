@@ -11,6 +11,9 @@ tychambers3@gmail.com - (705) 761-0611 - Peterborough, ON
 - Deployed and configured a self-hosted** Pelias geocoding server** with multiple dataset integrations to reverse geocode hundreds of thousands of full and partial addresses at scale  
 - Implemented multiple parser and scraping functions to collect and format datasets into clean and readable data for public consumption  
 - Achieved viral status among Canadians, politicians, and media outlets. Being featured in multiple high-profile news outlets and performed interviews with radio shows  
+- Built a custom AI chatbot that allows users to query cleaned government datasets with natural language. The system sends approved table names, column layouts, and data annotations to the AI, which generates controlled read-only queries and formats human-readable responses for conversational data exploration
+- Built an admin dashboard to manage data scrapes, automate social media posting to X, Reddit, and Facebook, and schedule automated data gathering for social content distribution
+- Implemented a dynamic Open Graph service with custom templates, generating unique preview images and metadata for shared links across social platforms
 - Implemented AI in developing features, maintaining the kubernetes stack, and effective debugging  
    
 **This Dot - Remote** **** **** **** **** **** **** **** **** **** **       Mar 2024 - Present**  

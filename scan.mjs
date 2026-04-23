@@ -81,6 +81,7 @@ function parseGreenhouse(json, companyName) {
     url: j.absolute_url || '',
     company: companyName,
     location: j.location?.name || '',
+    postedAt: j.updated_at || null,
   }));
 }
 
@@ -91,6 +92,7 @@ function parseAshby(json, companyName) {
     url: j.jobUrl || '',
     company: companyName,
     location: j.location || '',
+    postedAt: j.publishedAt || null,
   }));
 }
 
@@ -101,6 +103,7 @@ function parseLever(json, companyName) {
     url: j.hostedUrl || '',
     company: companyName,
     location: j.categories?.location || '',
+    postedAt: j.createdAt ? new Date(j.createdAt).toISOString() : null,
   }));
 }
 
@@ -254,6 +257,9 @@ async function main() {
   const dryRun = args.includes('--dry-run');
   const companyFlag = args.indexOf('--company');
   const filterCompany = companyFlag !== -1 ? args[companyFlag + 1]?.toLowerCase() : null;
+  const maxAgeArg = args.indexOf('--max-age');
+  const maxAgeHours = maxAgeArg !== -1 ? parseInt(args[maxAgeArg + 1], 10) : 24;
+  const cutoff = maxAgeHours > 0 ? new Date(Date.now() - maxAgeHours * 60 * 60 * 1000) : null;
 
   // 1. Read portals.yml
   if (!existsSync(PORTALS_PATH)) {
@@ -285,6 +291,7 @@ async function main() {
   const date = new Date().toISOString().slice(0, 10);
   let totalFound = 0;
   let totalFiltered = 0;
+  let totalTooOld = 0;
   let totalDupes = 0;
   const newOffers = [];
   const errors = [];
@@ -299,6 +306,10 @@ async function main() {
       for (const job of jobs) {
         if (!titleFilter(job.title)) {
           totalFiltered++;
+          continue;
+        }
+        if (cutoff && job.postedAt && new Date(job.postedAt) < cutoff) {
+          totalTooOld++;
           continue;
         }
         if (seenUrls.has(job.url)) {
@@ -335,6 +346,9 @@ async function main() {
   console.log(`Companies scanned:     ${targets.length}`);
   console.log(`Total jobs found:      ${totalFound}`);
   console.log(`Filtered by title:     ${totalFiltered} removed`);
+  if (cutoff) {
+    console.log(`Filtered by age:       ${totalTooOld} skipped (older than ${maxAgeHours}h)`);
+  }
   console.log(`Duplicates:            ${totalDupes} skipped`);
   console.log(`New offers added:      ${newOffers.length}`);
 

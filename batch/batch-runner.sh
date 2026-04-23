@@ -368,7 +368,7 @@ process_offer() {
     # Try to extract score from worker output
     local score="-"
     local score_match
-   score_match=$(sed -nE 's/.*"score":[[:space:]]*([0-9.]+).*/\1/p' "$log_file" 2>/dev/null | head -1 || true)
+    score_match=$(sed -nE 's/.*"score":[[:space:]]*([0-9.]+).*/\1/p' "$log_file" 2>/dev/null | head -1 || true)
     if [[ -n "$score_match" ]]; then
       score="$score_match"
     fi
@@ -391,6 +391,103 @@ process_offer() {
     update_state "$id" "$url" "failed" "$started_at" "$completed_at" "$report_num" "-" "$error_msg" "$retries"
     echo "    ❌ Failed (attempt $retries, exit code $exit_code)"
   fi
+}
+
+# Pre-flight liveness check — filters dead URLs before spending tokens
+# Removes expired entries from pending_ids/urls/sources/notes arrays in-place
+preflight_liveness() {
+  local -n _ids="$1"
+  local -n _urls="$2"
+  local -n _sources="$3"
+  local -n _notes="$4"
+
+  local count=${#_ids[@]}
+  if (( count == 0 )); then return; fi
+
+  echo "=== Pre-flight liveness check ($count URLs) ==="
+
+  # Write URLs to temp file
+  local url_file
+  url_file=$(mktemp /tmp/batch-liveness-XXXXXX.txt)
+  for url in "${_urls[@]}"; do
+    echo "$url" >> "$url_file"
+  done
+
+  # Run liveness checker with JSON output
+  local json_output
+  json_output=$(node "$PROJECT_DIR/check-liveness.mjs" --file "$url_file" --output json 2>/dev/null || true)
+  rm -f "$url_file"
+
+  if [[ -z "$json_output" ]]; then
+    echo "WARN: Liveness check returned no output — skipping pre-flight, processing all."
+    return
+  fi
+
+  # Parse JSON lines into a TSV lookup file (url TAB result TAB reason)
+  local jsonl_file lookup_file
+  jsonl_file=$(mktemp /tmp/batch-liveness-jsonl-XXXXXX.txt)
+  lookup_file=$(mktemp /tmp/batch-liveness-lookup-XXXXXX.tsv)
+  printf '%s\n' "$json_output" > "$jsonl_file"
+  node -e "
+    const fs = require('fs');
+    const lines = fs.readFileSync(process.argv[1], 'utf-8').trim().split('\n');
+    for (const line of lines) {
+      if (!line.trim()) continue;
+      try {
+        const o = JSON.parse(line);
+        process.stdout.write(o.url + '\t' + (o.result || 'uncertain') + '\t' + (o.reason || '') + '\n');
+      } catch {}
+    }
+  " "$jsonl_file" > "$lookup_file" 2>/dev/null || true
+  rm -f "$jsonl_file"
+
+  declare -A liveness_result
+  while IFS=$'\t' read -r url result reason; do
+    [[ -z "$url" ]] && continue
+    liveness_result["$url"]="${result}|${reason}"
+  done < "$lookup_file"
+  rm -f "$lookup_file"
+
+  # Filter arrays, mark expired in state
+  local -a new_ids=() new_urls=() new_sources=() new_notes=()
+  local skipped=0
+
+  for i in "${!_ids[@]}"; do
+    local id="${_ids[$i]}"
+    local url="${_urls[$i]}"
+    local entry="${liveness_result[$url]:-}"
+    local result="${entry%%|*}"
+    local reason="${entry##*|}"
+
+    if [[ "$result" == "expired" ]]; then
+      echo "  ❌ SKIP #$id (dead link): $url"
+      echo "       $reason"
+      local now
+      now=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+      update_state "$id" "$url" "skipped" "$now" "$now" "-" "-" "liveness: $reason" "0"
+      skipped=$((skipped + 1))
+    else
+      if [[ "$result" == "uncertain" ]]; then
+        echo "  ⚠️  UNCERTAIN #$id (proceeding): $url"
+      else
+        echo "  ✅ OK #$id: $url"
+      fi
+      new_ids+=("$id")
+      new_urls+=("$url")
+      new_sources+=("${_sources[$i]}")
+      new_notes+=("${_notes[$i]}")
+    fi
+  done
+
+  echo ""
+  echo "Pre-flight: $skipped dead removed, ${#new_ids[@]} remaining"
+  echo ""
+
+  # Update caller's arrays
+  _ids=("${new_ids[@]}")
+  _urls=("${new_urls[@]}")
+  _sources=("${new_sources[@]}")
+  _notes=("${new_notes[@]}")
 }
 
 # Merge tracker additions into applications.md
@@ -530,6 +627,17 @@ main() {
 
   echo "Pending: $pending_count offers"
   echo ""
+
+  # Pre-flight: filter dead URLs before processing (skip in dry-run)
+  if [[ "$DRY_RUN" == "false" ]]; then
+    preflight_liveness pending_ids pending_urls pending_sources pending_notes
+    pending_count=${#pending_ids[@]}
+    if (( pending_count == 0 )); then
+      echo "No live offers to process after pre-flight check."
+      print_summary
+      exit 0
+    fi
+  fi
 
   # Dry run: just list
   if [[ "$DRY_RUN" == "true" ]]; then

@@ -1,51 +1,42 @@
-**Tyrel Chambers **  
-tychambers3@gmail.com - (705) 761-0611 - Peterborough, ON  
-   
-**WORK EXPERIENCE **  
-** **  
-**JobWatchCanada ** **- Remote** **    July 2025 – Present**  
-*Software Engineer*  
-- Architected full-stack web app **(Golang, React, TypeScript, PostgreSQL) **processing  **millions **of Open Government data points; drove  **20K+ unique visitors** in first 2 months.  
-- Optimized full-stack performance across a **Golang + React** application handling millions of records, achieving fast load times through efficient data pagination, caching strategies, and query optimization  
-- Rendered ~**500,000 geospatial** data points interactively using MapLibre GL  
-- Deployed and configured a self-hosted** Pelias geocoding server** with multiple dataset integrations to reverse geocode hundreds of thousands of full and partial addresses at scale  
-- Implemented multiple parser and scraping functions to collect and format datasets into clean and readable data for public consumption  
-- Achieved viral status among Canadians, politicians, and media outlets. Being featured in multiple high-profile news outlets and performed interviews with radio shows  
-- Built a custom AI chatbot that allows users to query cleaned government datasets with natural language. The system sends approved table names, column layouts, and data annotations to the AI, which generates controlled read-only queries and formats human-readable responses for conversational data exploration
-- Built an admin dashboard to manage data scrapes, automate social media posting to X, Reddit, and Facebook, and schedule automated data gathering for social content distribution
-- Implemented a dynamic Open Graph service with custom templates, generating unique preview images and metadata for shared links across social platforms
-- Implemented AI in developing features, maintaining the kubernetes stack, and effective debugging  
-   
-**This Dot - Remote** **** **** **** **** **** **** **** **** **** **       Mar 2024 - Present**  
-*Software Engineer*  
-- Conducted ~10 structured user research interviews to identify onboarding friction points, translating findings into actionable UX recommendations that streamlined a complex workflow and directly contributed to improved customer retention  
-- Drove feature ownership across product and customer success for Data Mapper for Mailchimp - gathering customer feedback, writing specs, and prioritizing enhancements for a high-scale app with ~**10,000 DAU** processing over  **9M Stripe webhook **events per month  
-- Aggregated customer support emails to create a comprehensive documentation solution using an online service to assist customers in troubleshooting their issues which resulted in **50% less support tickets**  
-- Sole engineer on a published Docusign Maestro marketplace integration — built end-to-end in **Javascript (Next.js)** to automatically sync contacts with Constant Contact directly from within active Maestro signing workflows  
-- Liaison with users and development team to facilitate a positive user experience within our app with millions of events occurring and thousands of users each month  
-- Expert use of AI to help integrate apps with third-party providers  
-   
-**This Dot - Remote** **** **** **** **** **** **** **** **** **** **   Sept 2021 – Sept 2023**  
-*Software Engineer*  
-- Used **React, Typescript, **and  **NestJS** to develop a Google Drive app for Stripe that amassed  **40,000+ installs **  
-- Partnered with **Stripe’s development team **to validate Stripe Apps platform pre-release and verify developer experience  
-- **Subject Matter Expert** in 2 green-field applications built as part of the initial apps on the  **Stripe Apps platform**  
-- Influenced company policy by creating a proposal for an alternative hosting solution that was implemented company-wide resulting in **cheaper hosting costs** and therefore ** lower overhead**  
-   
-   
-   
-   
-   
-   
-**SKILLS **  
-   
-**Front-end: **React, Next, JavaScript, TypeScript, React-Query, Playwright, Vitest, HTML, CSS, Astro, Sanity, Sentry  
-**Back-end: **Go, NestJS,  Express.js, PostgreSQL, Socket.io, MongoDB, Stripe SDK, AWS, Docker, Redis, Ruby on Rails  
-**Infrastructure: **Github Actions, Digital Ocean, Netlify, Vercel, GCP, Traefik, Kubernetes  
-**AI: **Claude, Agents  
-   
-**LINKS **  
-   
-https://tyrelchambers.com  
-https://github.com/tyrelchambers  
-https://linkedin.com/in/tyrel-chambers-8ab581214/  
+**Tyrel Chambers**
+tychambers3@gmail.com - (705) 761-0611 - Peterborough, ON
+
+**WORK EXPERIENCE**
+
+**JobWatchCanada** - Remote          July 2025 – Present
+*Software Engineer*
+- Built entire product solo — Go backend (concurrent scrapers, geospatial pipelines, geocoding), React+TypeScript frontend, PostgreSQL; drove **20K+ unique visitors** in first 2 months with zero paid acquisition; national media coverage, cited by politicians
+- Rendered **~500,000 geospatial data points** interactively via MapLibre GL; tuned pagination, caching, and query structure across millions of records to keep load times fast
+- Designed production NL-to-SQL interface: exposes only approved table schemas to the LLM, generates controlled read-only SQL, returns conversational responses — explicit guardrails prevent data misuse
+- Built admin dashboard with AI-driven content scheduling, automated cross-platform social posting (X, Reddit, Facebook), and per-URL Open Graph image generation
+
+**This Dot** - Remote                Mar 2024 – Present
+*Software Engineer + Customer Success Engineer*
+*Recruited back after a ~50% company-wide restructuring*
+- Daily production triage — investigate bugs, reproduce edge cases, write and resolve tickets; technical escalation point between users and engineering; reviewed code team-wide and flagged architectural concerns before they shipped
+- Owned Data Mapper for Mailchimp end-to-end: ran **10 structured user research interviews**, wrote specs, prioritized backlog for a **10K DAU** app processing **9M Stripe webhook events/month**; reduced support tickets **50%**
+- Sole engineer on published DocuSign Maestro marketplace integration — built end-to-end in Next.js/TypeScript with OAuth flows and full marketplace publication
+
+**This Dot** - Remote                Sept 2021 – Sept 2023
+*Software Engineer*
+- Built the full frontend for a Google Drive app on the Stripe Apps platform from scratch; delivered a feature the team lead scoped as too costly to build in a week — shipped it in a day; **40,000+ installs**
+- One of 2 SMEs on Stripe Apps platform pre-release — partnered with Stripe's engineering team to validate the platform and shape developer experience at launch
+- Identified infrastructure cost problem, wrote a proposal comparing 4 alternatives, drove company-wide adoption — reduced hosting overhead for the entire org
+
+**SKILLS**
+
+**Frontend:** React, Next.js, TypeScript, JavaScript, React Query, Playwright, Vitest, HTML, CSS, Sanity, Sentry
+**Backend:** Go, NestJS, Express.js, PostgreSQL, Socket.io, MongoDB, Stripe SDK, Redis, Docker, AWS
+**Infrastructure:** Kubernetes, GitHub Actions, GCP, DigitalOcean, Traefik, HAProxy
+**AI / LLM:** NL-to-SQL, agent orchestration, prompt engineering, LLM integration, Grok API
+
+**PROJECTS**
+
+**Reddex** — https://reddex.app — Solo-built Reddit automation tool; third-party API integrations, live users
+**JobWatchCanada** — https://jobwatchcanada.com — Geospatial job market visualization; 20K+ visitors, national media
+
+**LINKS**
+
+https://tyrelchambers.com
+https://github.com/tyrelchambers
+https://linkedin.com/in/tyrel-chambers-8ab581214/

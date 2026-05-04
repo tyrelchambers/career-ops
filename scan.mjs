@@ -81,7 +81,6 @@ function parseGreenhouse(json, companyName) {
     url: j.absolute_url || '',
     company: companyName,
     location: j.location?.name || '',
-    postedAt: j.updated_at || null,
   }));
 }
 
@@ -92,7 +91,6 @@ function parseAshby(json, companyName) {
     url: j.jobUrl || '',
     company: companyName,
     location: j.location || '',
-    postedAt: j.publishedAt || null,
   }));
 }
 
@@ -103,7 +101,6 @@ function parseLever(json, companyName) {
     url: j.hostedUrl || '',
     company: companyName,
     location: j.categories?.location || '',
-    postedAt: j.createdAt ? new Date(j.createdAt).toISOString() : null,
   }));
 }
 
@@ -134,32 +131,6 @@ function buildTitleFilter(titleFilter) {
     const hasPositive = positive.length === 0 || positive.some(k => lower.includes(k));
     const hasNegative = negative.some(k => lower.includes(k));
     return hasPositive && !hasNegative;
-  };
-}
-
-// ── Location filter ─────────────────────────────────────────────────
-
-function buildLocationFilter(locationFilter) {
-  if (!locationFilter || locationFilter.enabled === false) {
-    return () => ({ pass: true });
-  }
-
-  const allowed = (locationFilter.allowed_substrings || []).map(s => s.toLowerCase());
-  const blocked = (locationFilter.blocked_substrings || []).map(s => s.toLowerCase());
-  const ambiguousAction = locationFilter.ambiguous_action || 'flag';
-
-  return (location) => {
-    if (!location || !location.trim()) {
-      return { pass: ambiguousAction !== 'block', ambiguous: true, reason: 'empty' };
-    }
-    const lower = location.toLowerCase();
-    const allowedMatch = allowed.find(k => lower.includes(k));
-    if (allowedMatch) return { pass: true, reason: `allowed:${allowedMatch.trim()}` };
-
-    const blockedMatch = blocked.find(k => lower.includes(k));
-    if (blockedMatch) return { pass: false, reason: `blocked:${blockedMatch.trim()}` };
-
-    return { pass: ambiguousAction === 'allow' || ambiguousAction === 'flag', ambiguous: true, reason: 'no_match' };
   };
 }
 
@@ -283,9 +254,6 @@ async function main() {
   const dryRun = args.includes('--dry-run');
   const companyFlag = args.indexOf('--company');
   const filterCompany = companyFlag !== -1 ? args[companyFlag + 1]?.toLowerCase() : null;
-  const maxAgeArg = args.indexOf('--max-age');
-  const maxAgeHours = maxAgeArg !== -1 ? parseInt(args[maxAgeArg + 1], 10) : 24;
-  const cutoff = maxAgeHours > 0 ? new Date(Date.now() - maxAgeHours * 60 * 60 * 1000) : null;
 
   // 1. Read portals.yml
   if (!existsSync(PORTALS_PATH)) {
@@ -296,7 +264,6 @@ async function main() {
   const config = parseYaml(readFileSync(PORTALS_PATH, 'utf-8'));
   const companies = config.tracked_companies || [];
   const titleFilter = buildTitleFilter(config.title_filter);
-  const locationFilter = buildLocationFilter(config.location_filter);
 
   // 2. Filter to enabled companies with detectable APIs
   const targets = companies
@@ -318,9 +285,6 @@ async function main() {
   const date = new Date().toISOString().slice(0, 10);
   let totalFound = 0;
   let totalFiltered = 0;
-  let totalFilteredByLocation = 0;
-  let totalAmbiguousLocation = 0;
-  let totalTooOld = 0;
   let totalDupes = 0;
   const newOffers = [];
   const errors = [];
@@ -337,16 +301,6 @@ async function main() {
           totalFiltered++;
           continue;
         }
-        const locResult = locationFilter(job.location);
-        if (!locResult.pass) {
-          totalFilteredByLocation++;
-          continue;
-        }
-        if (locResult.ambiguous) totalAmbiguousLocation++;
-        if (cutoff && job.postedAt && new Date(job.postedAt) < cutoff) {
-          totalTooOld++;
-          continue;
-        }
         if (seenUrls.has(job.url)) {
           totalDupes++;
           continue;
@@ -359,7 +313,7 @@ async function main() {
         // Mark as seen to avoid intra-scan dupes
         seenUrls.add(job.url);
         seenCompanyRoles.add(key);
-        newOffers.push({ ...job, source: `${type}-api`, locationAmbiguous: !!locResult.ambiguous });
+        newOffers.push({ ...job, source: `${type}-api` });
       }
     } catch (err) {
       errors.push({ company: company.name, error: err.message });
@@ -381,13 +335,6 @@ async function main() {
   console.log(`Companies scanned:     ${targets.length}`);
   console.log(`Total jobs found:      ${totalFound}`);
   console.log(`Filtered by title:     ${totalFiltered} removed`);
-  console.log(`Filtered by location:  ${totalFilteredByLocation} removed (blocked region)`);
-  if (totalAmbiguousLocation > 0) {
-    console.log(`Ambiguous location:    ${totalAmbiguousLocation} flagged (verify before applying)`);
-  }
-  if (cutoff) {
-    console.log(`Filtered by age:       ${totalTooOld} skipped (older than ${maxAgeHours}h)`);
-  }
   console.log(`Duplicates:            ${totalDupes} skipped`);
   console.log(`New offers added:      ${newOffers.length}`);
 
@@ -401,8 +348,7 @@ async function main() {
   if (newOffers.length > 0) {
     console.log('\nNew offers:');
     for (const o of newOffers) {
-      const flag = o.locationAmbiguous ? ' [?]' : '';
-      console.log(`  + ${o.company} | ${o.title} | ${o.location || 'N/A'}${flag}`);
+      console.log(`  + ${o.company} | ${o.title} | ${o.location || 'N/A'}`);
     }
     if (dryRun) {
       console.log('\n(dry run — run without --dry-run to save results)');

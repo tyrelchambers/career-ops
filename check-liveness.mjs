@@ -75,24 +75,18 @@ async function main() {
   if (args.length === 0) {
     console.error('Usage: node check-liveness.mjs <url1> [url2] ...');
     console.error('       node check-liveness.mjs --file urls.txt');
-    console.error('       node check-liveness.mjs --file urls.txt --output json');
     process.exit(1);
   }
 
-  // Parse --output flag
-  const outputFlagIdx = args.indexOf('--output');
-  const outputFormat = outputFlagIdx !== -1 ? args[outputFlagIdx + 1] : 'human';
-  const cleanArgs = args.filter((a, i) => a !== '--output' && i !== outputFlagIdx + 1);
-
   let urls;
-  if (cleanArgs[0] === '--file') {
-    const text = await readFile(cleanArgs[1], 'utf-8');
+  if (args[0] === '--file') {
+    const text = await readFile(args[1], 'utf-8');
     urls = text.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#'));
   } else {
-    urls = cleanArgs;
+    urls = args;
   }
 
-  if (outputFormat !== 'json') console.log(`Checking ${urls.length} URL(s)...\n`);
+  console.log(`Checking ${urls.length} URL(s)...\n`);
 
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
@@ -102,13 +96,9 @@ async function main() {
   // Sequential — project rule: never Playwright in parallel
   for (const url of urls) {
     const { result, reason } = await checkUrl(page, url);
-    if (outputFormat === 'json') {
-      process.stdout.write(JSON.stringify({ url, result, reason }) + '\n');
-    } else {
-      const icon = { active: '✅', expired: '❌', uncertain: '⚠️' }[result];
-      console.log(`${icon} ${result.padEnd(10)} ${url}`);
-      if (result !== 'active') console.log(`           ${reason}`);
-    }
+    const icon = { active: '✅', expired: '❌', uncertain: '⚠️' }[result];
+    console.log(`${icon} ${result.padEnd(10)} ${url}`);
+    if (result !== 'active') console.log(`           ${reason}`);
     if (result === 'active') active++;
     else if (result === 'expired') expired++;
     else uncertain++;
@@ -116,7 +106,7 @@ async function main() {
 
   await browser.close();
 
-  if (outputFormat !== 'json') console.log(`\nResults: ${active} active  ${expired} expired  ${uncertain} uncertain`);
+  console.log(`\nResults: ${active} active  ${expired} expired  ${uncertain} uncertain`);
   if (expired > 0 || uncertain > 0) process.exit(1);
 }
 

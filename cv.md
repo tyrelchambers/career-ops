@@ -5,7 +5,7 @@ tychambers3@gmail.com - (705) 761-0611 - Peterborough, ON
 
 **JobWatchCanada** - Remote          July 2025 – Present
 *Software Engineer*
-- Built entire product solo — Go backend (concurrent scrapers, geospatial pipelines, geocoding), React+TypeScript frontend, PostgreSQL; drove **20K+ unique visitors** in first 2 months with zero paid acquisition; national media coverage, cited by politicians
+- Built entire product solo — Go backend (concurrent scrapers, geospatial pipelines, geocoding), React+TypeScript frontend, PostgreSQL; **50,000+ unique visitors to date** with zero paid acquisition; national media coverage, cited by politicians
 - Rendered **~500,000 geospatial data points** interactively via MapLibre GL; tuned pagination, caching, and query structure across millions of records to keep load times fast
 - Designed production NL-to-SQL interface: exposes only approved table schemas to the LLM, generates controlled read-only SQL, returns conversational responses — explicit guardrails prevent data misuse
 - Built admin dashboard with AI-driven content scheduling, automated cross-platform social posting (X, Reddit, Facebook), and per-URL Open Graph image generation
@@ -13,9 +13,11 @@ tychambers3@gmail.com - (705) 761-0611 - Peterborough, ON
 **This Dot** - Remote                Mar 2024 – Present
 *Software Engineer + Customer Success Engineer*
 *Recruited back after a ~50% company-wide restructuring*
-- Daily production triage — investigate bugs, reproduce edge cases, write and resolve tickets; technical escalation point between users and engineering; reviewed code team-wide and flagged architectural concerns before they shipped
-- Owned Data Mapper for Mailchimp end-to-end: ran **10 structured user research interviews**, wrote specs, prioritized backlog for a **10K DAU** app processing **9M Stripe webhook events/month**; reduced support tickets **50%**
-- Sole engineer on published DocuSign Maestro marketplace integration — built end-to-end in Next.js/TypeScript with OAuth flows and full marketplace publication
+- Lead feature development for a Stripe App processing **10M+ Stripe events/month** — Express, React
+- Collaborated with Stripe development team to integrate a beta platform and provide critical feedback
+- Partnered with third-party teams to design and ship Stripe Apps from spec to launch — React, TypeScript
+- Integrated multiple Stripe apps and Docusign workflows with third-party APIs following specific success criteria
+- Architected and shipped DocuSign Maestro workflow apps in Next.js as sole engineer — full marketplace publication
 
 **This Dot** - Remote                Sept 2021 – Sept 2023
 *Software Engineer*
@@ -33,7 +35,7 @@ tychambers3@gmail.com - (705) 761-0611 - Peterborough, ON
 **PROJECTS**
 
 **Reddex** — https://reddex.app — Solo-built Reddit automation tool; third-party API integrations, live users
-**JobWatchCanada** — https://jobwatchcanada.com — Geospatial job market visualization; 20K+ visitors, national media
+**JobWatchCanada** — https://jobwatchcanada.com — Geospatial job market visualization; 50K+ visitors all-time, national media
 
 **LINKS**
 

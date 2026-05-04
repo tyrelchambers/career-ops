@@ -166,66 +166,6 @@ func ParseApplications(careerOpsPath string) []model.CareerApplication {
 	return apps
 }
 
-// ParsePendingOffers reads pipeline.md and returns pending (unevaluated) offers.
-func ParsePendingOffers(careerOpsPath string) []model.CareerApplication {
-	filePath := filepath.Join(careerOpsPath, "pipeline.md")
-	content, err := os.ReadFile(filePath)
-	if err != nil {
-		filePath = filepath.Join(careerOpsPath, "data", "pipeline.md")
-		content, err = os.ReadFile(filePath)
-		if err != nil {
-			return nil
-		}
-	}
-
-	lines := strings.Split(string(content), "\n")
-	var pending []model.CareerApplication
-	inPending := false
-
-	for _, line := range lines {
-		trimmed := strings.TrimSpace(line)
-
-		// Detect section boundaries
-		if strings.HasPrefix(trimmed, "## ") {
-			inPending = strings.Contains(strings.ToLower(trimmed), "pending") ||
-				strings.Contains(strings.ToLower(trimmed), "pendiente")
-			continue
-		}
-
-		if !inPending {
-			continue
-		}
-
-		// Only unchecked items
-		if !strings.HasPrefix(trimmed, "- [ ] ") {
-			continue
-		}
-
-		// Strip the checkbox prefix
-		entry := strings.TrimPrefix(trimmed, "- [ ] ")
-		parts := strings.SplitN(entry, " | ", 3)
-
-		var app model.CareerApplication
-		app.Status = "Pending"
-
-		switch len(parts) {
-		case 3:
-			app.JobURL = strings.TrimSpace(parts[0])
-			app.Company = strings.TrimSpace(parts[1])
-			app.Role = strings.TrimSpace(parts[2])
-		case 2:
-			app.JobURL = strings.TrimSpace(parts[0])
-			app.Company = strings.TrimSpace(parts[1])
-		case 1:
-			app.JobURL = strings.TrimSpace(parts[0])
-		}
-
-		pending = append(pending, app)
-	}
-
-	return pending
-}
-
 // loadBatchInputURLs reads batch-input.tsv and returns a map of batch ID -> job URL.
 func loadBatchInputURLs(careerOpsPath string) map[string]string {
 	inputPath := filepath.Join(careerOpsPath, "batch", "batch-input.tsv")
@@ -541,8 +481,6 @@ func NormalizeStatus(raw string) string {
 
 	switch {
 	// Most restrictive first — accepts both English and Spanish
-	case s == "pending":
-		return "pending"
 	case strings.Contains(s, "no aplicar") || strings.Contains(s, "no_aplicar") || s == "skip" || strings.Contains(s, "geo blocker"):
 		return "skip"
 	case strings.Contains(s, "interview") || strings.Contains(s, "entrevista"):
@@ -654,8 +592,6 @@ func cleanTableCell(s string) string {
 // StatusPriority returns the sort priority for a status (lower = higher priority).
 func StatusPriority(status string) int {
 	switch NormalizeStatus(status) {
-	case "pending":
-		return -1
 	case "interview":
 		return 0
 	case "offer":

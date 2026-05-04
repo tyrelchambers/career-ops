@@ -1,27 +1,23 @@
-# Mode: tracker — Application Tracker
+# Modo: tracker — Tracker de Aplicaciones
 
-Read and display `data/applications.md`.
+Lee y muestra `data/applications.md`.
 
-**Tracker format:**
+**Formato del tracker:**
 ```markdown
-| # | Date | Company | Role | Score | Status | PDF | Report |
+| # | Fecha | Empresa | Rol | Score | Estado | PDF | Report |
 ```
 
-Possible statuses: `Evaluated` → `Applied` → `Responded` → `Interview` → `Offer` / `Rejected` / `Discarded` / `SKIP`
+Estados posibles: `Evaluada` → `Aplicado` → `Respondido` → `Contacto` → `Entrevista` → `Oferta` / `Rechazada` / `Descartada` / `NO APLICAR`
 
-- `Applied` = the candidate submitted their application
-- `Responded` = a recruiter/company reached out and the candidate replied (inbound)
-- `Interview` = actively in the interview process
-- `Offer` = offer received
-- `Rejected` = rejected by the company
-- `Discarded` = discarded by candidate or offer closed
-- `SKIP` = doesn't fit, don't apply
+- `Aplicado` = el candidato envió su candidatura
+- `Respondido` = Un recruiter/empresa contactó y el candidato respondió (inbound)
+- `Contacto` = El candidato contactó proactivamente a alguien de la empresa (outbound, ej: LinkedIn power move)
 
-If the user asks to update a status, edit the corresponding row.
+Si el usuario pide actualizar un estado, editar la fila correspondiente.
 
-Show also statistics:
-- Total applications
-- By status
-- Average score
-- % with PDF generated
-- % with report generated
+Mostrar también estadísticas:
+- Total de aplicaciones
+- Por estado
+- Score promedio
+- % con PDF generado
+- % con report generado

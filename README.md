@@ -157,7 +157,7 @@ node gemini-eval.mjs --file ./jds/my-job.txt
 npm run gemini:eval -- "JD text here"
 ```
 
-> **Free tier:** Both options work without billing. Native CLI uses Google OAuth; the API script uses `gemini-2.0-flash` (15 RPM, 1M tokens/day free).
+> **Free tier:** Both options work without billing. Native CLI uses Google OAuth; the API script uses `gemini-2.5-flash` (15 RPM, 1M tokens/day free).
 
 ## Usage
 
@@ -217,6 +217,14 @@ The scanner comes with **45+ companies** ready to scan and **19 search queries**
 
 **Job boards searched:** Ashby, Greenhouse, Lever, Wellfound, Workable, RemoteFront
 
+By default `node scan.mjs` (a.k.a. `npm run scan`) trusts what each ATS feed returns. Some companies leave stale postings in their public API even after the role is closed, so those expired entries can leak into `pipeline.md`. Pass `--verify` to launch Playwright after the API pass and drop expired postings before they hit the pipeline:
+
+```bash
+node scan.mjs --verify          # zero-token discovery + Playwright liveness check
+```
+
+The verification is sequential and only runs against new offers (after dedup), so the cost stays bounded.
+
 ## Dashboard TUI
 
 The built-in terminal dashboard lets you browse your pipeline visually:
@@ -233,7 +241,8 @@ Features: 6 filter tabs, 4 sort modes, grouped/flat view, lazy-loaded previews, 
 
 ```
 career-ops/
-├── CLAUDE.md                    # Agent instructions
+├── AGENTS.md                    # Canonical agent instructions (all CLIs)
+├── CLAUDE.md                    # Claude Code wrapper (imports AGENTS.md)
 ├── cv.md                        # Your CV (create this)
 ├── article-digest.md            # Your proof points (optional)
 ├── config/

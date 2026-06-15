@@ -4,38 +4,41 @@ tychambers3@gmail.com - (705) 761-0611 - Peterborough, ON
 **WORK EXPERIENCE**
 
 **JobWatchCanada** - Remote          July 2025 – Present
-*Software Engineer*
-- Built entire product solo — Go backend (concurrent scrapers, geospatial pipelines, geocoding), React+TypeScript frontend, PostgreSQL; **50,000+ unique visitors to date** with zero paid acquisition; national media coverage, cited by politicians
-- Rendered **~500,000 geospatial data points** interactively via MapLibre GL; tuned pagination, caching, and query structure across millions of records to keep load times fast
-- Designed production NL-to-SQL interface: exposes only approved table schemas to the LLM, generates controlled read-only SQL, returns conversational responses — explicit guardrails prevent data misuse
-- Built admin dashboard with AI-driven content scheduling, automated cross-platform social posting (X, Reddit, Facebook), and per-URL Open Graph image generation
+*Founder & Engineer*
+- Drove the product to viral reach across Canada, 20K+ visitors in two months, earning coverage in Toronto Sun, Toronto Star, Yahoo News, The Canadian Press, and a live radio with CJAD800 Montreal.
+- Architected a full-stack web app processing millions of Open Government data points (Go, React, TypeScript, PostgreSQL).
+- Optimized full-stack performance on a Go + React app handling millions of records through data pagination, caching, and query optimization.
+- Rendered 500,000+ geospatial data points interactively with MapLibre GL, holding smooth pan/zoom at scale through clustering and tile optimization.
+- Deployed a self-hosted Pelias geocoding server with multiple dataset integrations, reverse-geocoding hundreds of thousands of full and partial addresses at scale.
+- Built parsing and scraping pipelines that normalized heterogeneous government datasets into clean, queryable public data.
+- Implemented AI in developing features, maintaining the Kubernetes stack, and effective debugging
 
-**This Dot** - Remote                Mar 2024 – Present
-*Software Engineer + Customer Success Engineer*
-*Recruited back after a ~50% company-wide restructuring*
-- Lead feature development for a Stripe App processing **10M+ Stripe events/month** — Express, React
-- Collaborated with Stripe development team to integrate a beta platform and provide critical feedback
-- Partnered with third-party teams to design and ship Stripe Apps from spec to launch — React, TypeScript
-- Integrated multiple Stripe apps and Docusign workflows with third-party APIs following specific success criteria
-- Architected and shipped DocuSign Maestro workflow apps in Next.js as sole engineer — full marketplace publication
-
-**This Dot** - Remote                Sept 2021 – Sept 2023
+**This Dot** - Remote          Mar 2024 – Present
 *Software Engineer*
-- Built the full frontend for a Google Drive app on the Stripe Apps platform from scratch; delivered a feature the team lead scoped as too costly to build in a week — shipped it in a day; **40,000+ installs**
-- One of 2 SMEs on Stripe Apps platform pre-release — partnered with Stripe's engineering team to validate the platform and shape developer experience at launch
-- Identified infrastructure cost problem, wrote a proposal comparing 4 alternatives, drove company-wide adoption — reduced hosting overhead for the entire org
+- Sole engineer on a published DocuSign Maestro marketplace integration, built end-to-end (Next.js) to auto-sync contacts with Constant Contact from inside active signing workflows.
+- Drove feature ownership across product and customer success for Data Mapper for Mailchimp — gathering feedback, writing specs, and prioritizing enhancements for an app at ~10,000 DAU processing 11M+ Stripe webhook events/month.
+- Identified, advocated for, and shipped an authentication-flow improvement that recovered ~$7,900/year in revenue.
+- Implemented new features in the Stripe app ecosystem to improve the user experience of Data Mapper – providing clarity, customization, and a positive user experience
+
+**This Dot** - Remote          Sept 2021 – Sept 2023
+*Software Engineer*
+- Built a Google Drive app for Stripe that reached 40,000+ installs (React, TypeScript, NestJS).
+- Partnered with Stripe's engineering team to validate the platform pre-release and stress-test the developer experience.
+- Served as SME for two greenfield apps among the first built on the Stripe Apps platform.
+- Authored a hosting-architecture proposal adopted company-wide, cutting hosting costs by 60%.
 
 **SKILLS**
 
-**Frontend:** React, Next.js, TypeScript, JavaScript, React Query, Playwright, Vitest, HTML, CSS, Sanity, Sentry
-**Backend:** Go, NestJS, Express.js, PostgreSQL, Socket.io, MongoDB, Stripe SDK, Redis, Docker, AWS
-**Infrastructure:** Kubernetes, GitHub Actions, GCP, DigitalOcean, Traefik, HAProxy
-**AI / LLM:** NL-to-SQL, agent orchestration, prompt engineering, LLM integration, Grok API
+**Front-end:** React, Next, JavaScript, TypeScript, React-Query, Playwright, Vitest, HTML, CSS, Astro, Sanity, Sentry
+**Back-end:** Go, NestJS, Express.js, PostgreSQL, Socket.io, MongoDB, Stripe SDK, AWS, Docker, Redis, Ruby on Rails
+**Infrastructure:** GitHub Actions, Digital Ocean, Netlify, Vercel, GCP, Traefik, Kubernetes
+**AI:** Claude Code
 
-**PROJECTS**
+**INTERESTS**
 
-**Reddex** — https://reddex.app — Solo-built Reddit automation tool; third-party API integrations, live users
-**JobWatchCanada** — https://jobwatchcanada.com — Geospatial job market visualization; 50K+ visitors all-time, national media
+- Maintaining my self-hosted Kubernetes cluster that utilizes two on-premises nodes: a computer running a Linux VM in Proxmox and another computer running a Linux VM inside TrueNAS, and a third off-premise node
+- Chasing thunderstorms, the auroras and other extreme weather
+- Photography and hiking
 
 **LINKS**
 

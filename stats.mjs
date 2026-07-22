@@ -14,10 +14,8 @@
  * `metadata.sources` says which files were found — a fresh clone with zero
  * user data emits the full contract shape with null sections.
  *
- * `runs` is always null in this version: it is reserved for per-run scan
- * counters from data/scan-runs.tsv, which lands with the scan.mjs write path
- * in a follow-up PR (see #1604 — the file is a data-contract change and ships
- * separately). The key exists now so the contract is stable for consumers.
+ * `runs` aggregates data/scan-runs.tsv (per-run counters written by scan.mjs,
+ * #1604 PR-2) — null until the first non-dry scan creates the file.
  */
 
 import { readFileSync, existsSync } from 'fs';
@@ -33,17 +31,20 @@ const SCAN_HISTORY_FILE = join(ROOT, 'data', 'scan-history.tsv');
 const FOLLOWUPS_FILE = join(ROOT, 'data', 'follow-ups.md');
 const SCAN_RUNS_FILE = join(ROOT, 'data', 'scan-runs.tsv');
 const PORTALS_FILE = join(ROOT, 'portals.yml');
+const PORTAL_HEALTH_FILE = join(ROOT, 'data', 'portal-health.tsv');
 
-const CANONICAL_STATUSES = ['Evaluated', 'Applied', 'Responded', 'Interview', 'Offer', 'Rejected', 'Discarded', 'SKIP'];
+const CANONICAL_STATUSES = ['Evaluated', 'Applied', 'Responded', 'Interview', 'Offer', 'Hired', 'Rejected', 'Discarded', 'SKIP'];
 
 // In-flight applications. Deliberately NARROWER than the dashboard's
 // ActiveApps (which also counts Evaluated): an evaluated-but-never-sent row is
-// a candidate, not an application in flight.
+// a candidate, not an application in flight. Hired is a terminal success, not
+// in flight, so it is intentionally excluded here (but see PURSUED/funnel).
 const ACTIVE_STATUSES = new Set(['Applied', 'Responded', 'Interview', 'Offer']);
 
 // Rows that count toward avgScoreApplied — jobs the user actually pursued.
-// Plain avgScore mixes in SKIP/Discarded and understates real fit.
-const PURSUED_STATUSES = new Set(['Applied', 'Responded', 'Interview', 'Offer', 'Rejected']);
+// Plain avgScore mixes in SKIP/Discarded and understates real fit. Hired is
+// the fullest pursuit of all, so it belongs here.
+const PURSUED_STATUSES = new Set(['Applied', 'Responded', 'Interview', 'Offer', 'Hired', 'Rejected']);
 
 const round1 = (n) => Math.round(n * 10) / 10;
 const pct = (part, total) => (total > 0 ? round1((part / total) * 100) : 0);
@@ -117,8 +118,10 @@ export function trackerStatusByNum(content) {
 /**
  * Cumulative funnel: everX = "reached stage X or beyond, ever". The math
  * mirrors the dashboard's ComputeProgressMetrics (career.go): Rejected counts
- * into everApplied (a rejection proves a submission), and each later stage
- * sums itself plus everything beyond it. Rates are relative to everApplied.
+ * into everApplied (a rejection proves a submission), Hired counts into every
+ * stage through everOffer (a landed job proves the offer and everything before
+ * it), and each later stage sums itself plus everything beyond it. Rates are
+ * relative to everApplied.
  *
  * Keys are deliberately NOT bare status names — `tracker.byStatus.Applied` is
  * "currently in Applied" while `everApplied` is "ever applied"; the same word
@@ -134,10 +137,10 @@ export function trackerStatusByNum(content) {
  */
 export function computeFunnel(byStatus) {
   const n = (k) => byStatus[k] || 0;
-  const everApplied = n('Applied') + n('Responded') + n('Interview') + n('Offer') + n('Rejected');
-  const everResponded = n('Responded') + n('Interview') + n('Offer');
-  const everInterview = n('Interview') + n('Offer');
-  const everOffer = n('Offer');
+  const everApplied = n('Applied') + n('Responded') + n('Interview') + n('Offer') + n('Hired') + n('Rejected');
+  const everResponded = n('Responded') + n('Interview') + n('Offer') + n('Hired');
+  const everInterview = n('Interview') + n('Offer') + n('Hired');
+  const everOffer = n('Offer') + n('Hired');
   return {
     everApplied,
     everResponded,
@@ -233,7 +236,7 @@ export function scanCompanyNames(content) {
  * @param {object|null} scanStats - Result of computeScanStats (for activePortals).
  * @param {string[]} [producingCompanyNames] - From scanCompanyNames().
  */
-export function computePortalStats(portalsYmlContent, scanStats, producingCompanyNames = []) {
+export function computePortalStats(portalsYmlContent, scanStats, producingCompanyNames = [], portalHealthContent = null) {
   let cfg;
   try {
     cfg = yaml.load(String(portalsYmlContent ?? '')) || {};
@@ -248,12 +251,42 @@ export function computePortalStats(portalsYmlContent, scanStats, producingCompan
   const producing = new Set(producingCompanyNames.map((n) => String(n).toLowerCase()));
   let producingCompanies = 0;
   for (const name of configuredNames) if (producing.has(name)) producingCompanies++;
+
+  let persistentlyDead = 0;
+  if (portalHealthContent) {
+    const lines = portalHealthContent.split('\n');
+    const healthRecords = [];
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+      const parts = line.split('\t');
+      if (parts.length >= 3) {
+        healthRecords.push({ company: parts[1], status: parts[2] });
+      }
+    }
+    const streaks = new Map();
+    for (const r of healthRecords) {
+      if (r.status === 'slug_gone' || r.status === 'network') {
+        streaks.set(r.company, (streaks.get(r.company) || 0) + 1);
+      } else if (r.status === 'reachable' || r.status === 'empty') {
+        streaks.set(r.company, 0);
+      }
+    }
+    const threshold = cfg.portal_health_threshold || 3;
+    for (const [company, streak] of streaks.entries()) {
+      if (streak >= threshold && configuredNames.has(String(company).toLowerCase())) {
+        persistentlyDead++;
+      }
+    }
+  }
+
   return {
     configuredCompanies: companies.length,
     configuredBoards: boards.length,
     activePortals: Object.keys(scanStats?.byPortal || {}).length,
     producingCompanies,
     producingPct: pct(producingCompanies, configuredNames.size),
+    persistentlyDead,
   };
 }
 
@@ -293,6 +326,54 @@ export function computeFollowupStats(followupsContent, trackerByNum) {
   };
 }
 
+// ── Scan-run trends ─────────────────────────────────────────────────
+
+/**
+ * Aggregate data/scan-runs.tsv (written by scan.mjs, one row per non-dry run).
+ *
+ * Header-name parsing, NEVER positional: columns may be appended in later
+ * schema versions and a positional slice would silently miscount from then on.
+ * Torn rows (crash mid-append) and rows with a bad timestamp are skipped;
+ * failed runs count in totalRuns/failedRuns but are excluded from averages so
+ * an aborted run doesn't drag the trend down.
+ *
+ * @param {string} content - Raw scan-runs.tsv text.
+ * @returns {object|null} null for empty/unknown-schema files.
+ */
+export function computeRunStats(content) {
+  const lines = String(content ?? '').replace(/\r/g, '').split('\n').filter((l) => l.trim());
+  if (lines.length < 2) return null;
+  const header = lines[0].split('\t');
+  const idx = Object.fromEntries(header.map((h, i) => [h, i]));
+  if (idx.timestamp == null || idx.found == null) return null; // unknown schema
+  const filterCols = header.filter((h) => h.startsWith('filtered_'));
+  const rows = [];
+  for (const line of lines.slice(1)) {
+    const cols = line.split('\t');
+    if (cols.length < header.length) continue; // torn row
+    if (!/^\d{4}-\d{2}-\d{2}/.test(cols[idx.timestamp] || '')) continue;
+    const num = (name) => { const v = Number(cols[idx[name]]); return Number.isNaN(v) ? 0 : v; };
+    rows.push({
+      date: cols[idx.timestamp].slice(0, 10),
+      status: idx.status != null ? cols[idx.status] : 'completed',
+      found: num('found'),
+      filtered: filterCols.reduce((a, h) => a + num(h), 0),
+      newAdded: num('new_added'),
+    });
+  }
+  if (rows.length === 0) return null;
+  const completed = rows.filter((r) => r.status !== 'failed');
+  const sum = (arr, k) => arr.reduce((a, r) => a + r[k], 0);
+  return {
+    totalRuns: rows.length,
+    failedRuns: rows.length - completed.length,
+    lastRunDate: rows.map((r) => r.date).sort().at(-1),
+    avgFoundPerRun: completed.length ? round1(sum(completed, 'found') / completed.length) : 0,
+    avgNewPerRun: completed.length ? round1(sum(completed, 'newAdded') / completed.length) : 0,
+    filterRemovalPct: pct(sum(completed, 'filtered'), sum(completed, 'found')),
+  };
+}
+
 // ── Assembler + CLI ─────────────────────────────────────────────────
 
 /**
@@ -305,12 +386,15 @@ export function computeAllStats({
   followupsFile = FOLLOWUPS_FILE,
   scanRunsFile = SCAN_RUNS_FILE,
   portalsFile = PORTALS_FILE,
+  portalHealthFile = PORTAL_HEALTH_FILE,
 } = {}) {
   const read = (f) => (existsSync(f) ? readFileSync(f, 'utf-8') : null);
   const apps = read(appsFile);
   const scanHist = read(scanHistoryFile);
   const fups = read(followupsFile);
   const portals = read(portalsFile);
+  const runs = read(scanRunsFile);
+  const portalHealth = read(portalHealthFile);
   const tracker = apps ? computeTrackerStats(apps) : null;
   const scan = scanHist ? computeScanStats(scanHist) : null;
   return {
@@ -321,17 +405,16 @@ export function computeAllStats({
         scanHistory: !!scanHist,
         followups: !!fups,
         portals: !!portals,
-        scanRuns: existsSync(scanRunsFile),
+        scanRuns: !!runs,
+        portalHealth: !!portalHealth,
       },
     },
     tracker,
     funnel: tracker ? computeFunnel(tracker.byStatus) : null,
     scan,
-    portals: portals ? computePortalStats(portals, scan, scanHist ? scanCompanyNames(scanHist) : []) : null,
+    portals: portals ? computePortalStats(portals, scan, scanHist ? scanCompanyNames(scanHist) : [], portalHealth) : null,
     followups: fups && apps ? computeFollowupStats(fups, trackerStatusByNum(apps)) : null,
-    // Reserved for data/scan-runs.tsv per-run counters (PR-2 of #1604). The
-    // key ships now so the contract shape is stable for consumers.
-    runs: null,
+    runs: runs ? computeRunStats(runs) : null,
   };
 }
 
@@ -366,7 +449,8 @@ function printSummary(stats) {
   }
   const p = stats.portals;
   if (p) {
-    console.log(`Portals:    ${p.configuredCompanies} companies + ${p.configuredBoards} boards configured | ${p.producingCompanies} have produced a match (${p.producingPct}%) — low ≠ broken, may just be no openings`);
+    const deadPart = p.persistentlyDead > 0 ? ` | 🚨 ${p.persistentlyDead} persistently dead (run verify-portals.mjs)` : '';
+    console.log(`Portals:    ${p.configuredCompanies} companies + ${p.configuredBoards} boards configured | ${p.producingCompanies} have produced a match (${p.producingPct}%)${deadPart} — low ≠ broken, may just be no openings`);
   } else {
     console.log('Portals:    — no data (portals.yml missing)');
   }
@@ -376,7 +460,13 @@ function printSummary(stats) {
   } else {
     console.log('Follow-ups: — no data (data/follow-ups.md missing)');
   }
-  console.log('Runs:       — no data (data/scan-runs.tsv pending; see #1604 PR-2)');
+  const r = stats.runs;
+  if (r) {
+    const failed = r.failedRuns > 0 ? ` | ${r.failedRuns} failed` : '';
+    console.log(`Runs:       ${r.totalRuns} recorded (last ${r.lastRunDate})${failed} | avg ${r.avgFoundPerRun} found / ${r.avgNewPerRun} new per run | filters remove ${r.filterRemovalPct}%`);
+  } else {
+    console.log('Runs:       — no data (data/scan-runs.tsv missing; created by the next scan)');
+  }
   console.log('');
 }
 

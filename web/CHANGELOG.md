@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/tyrelchambers/career-ops/compare/web-v0.2.0...web-v0.2.1) (2026-07-22)
+
+
+### Bug Fixes
+
+* complete botched v1.17.0 update (updater aborted mid-checkout) ([1aaaa6c](https://github.com/tyrelchambers/career-ops/commit/1aaaa6cf25c036b6b9f9bc61305948da8a6ec827))
+
 ## [0.2.0](https://github.com/santifer/career-ops/compare/web-v0.1.0...web-v0.2.0) (2026-07-05)
 
 

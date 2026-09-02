@@ -1,2 +1,5 @@
-timestamp	status	companies	boards	found	filtered_title	filtered_tier	filtered_location	filtered_posting_age	filtered_salary	filtered_content	filtered_cooldown	dupes	new_added	errors	filtered_blacklist	filtered_visa	filtered_posted_date
-2026-07-22T22:49:55.833Z	completed	61	0	4618	4099	0	419	0	0	0	0	93	7	3	0	0	0
+timestamp	status	companies	boards	found	filtered_title	filtered_tier	filtered_location	filtered_posting_age	filtered_salary	filtered_content	filtered_cooldown	dupes	new_added	errors	filtered_blacklist	filtered_visa	filtered_posted_date	filtered_country_eligibility
+2026-08-26T01:59:46.458Z	completed	1	0	53	46	0	6	0	0	0	0	0	1	0	0	0	0	0
+2026-08-26T01:59:46.726Z	completed	1	0	23	20	0	3	0	0	0	0	0	0	0	0	0	0	0
+2026-08-31T00:00:50.607Z	completed	60	0	4891	4367	0	431	0	0	0	0	29	64	1	0	0	0	0
+2026-09-02T02:41:42.588Z	completed	60	0	4841	4379	0	386	0	0	0	0	74	2	1	0	0	0	0

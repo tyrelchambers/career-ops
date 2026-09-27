@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="{{LANG}}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{NAME}} — CV</title>
+<style>
+  /* Monochrome variant of cv-template.html: black type on white, thin black
+     rules, no colour fills. Same markup, placeholders, section markers and ATS
+     rules as the base template; only the visual layer differs. Tokens stay
+     overridable via config/profile.yml `style:`. */
+  :root {
+    --accent-color: #111111;
+    --secondary-color: #111111;
+    --text-color: #1f1f1f;
+    --muted-color: #4a4a4a;
+    --rule-color: #111111;
+    --font-family: "Liberation Sans", 'Helvetica Neue', Helvetica, Arial, 'DejaVu Sans', sans-serif;
+    --font-size: 10.5px;
+    /* Must match generate-pdf.mjs's PDF_PAGE_MARGIN (see cv-template.html). */
+    --page-margin: 0.6in;
+  }
+  @page { margin: var(--page-margin); }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    /* Ligatures off so PDF text extraction (ATS) never yields U+FB01 etc. */
+    font-variant-ligatures: none;
+    font-feature-settings: "liga" 0, "clig" 0, "dlig" 0;
+  }
+
+  html {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body {
+    font-family: var(--font-family);
+    font-size: var(--font-size);
+    line-height: 1.45;
+    color: var(--text-color);
+    background: #ffffff;
+    font-variant-ligatures: none;
+    font-feature-settings: "liga" 0, "clig" 0, "dlig" 0;
+  }
+
+  .page {
+    width: 100%;
+    max-width: {{PAGE_WIDTH}};
+    margin: 0 auto;
+    padding: 2px 0;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  /* === HEADER === */
+  .header {
+    margin-bottom: 16px;
+  }
+
+  .header h1 {
+    font-family: var(--font-family);
+    font-size: 24px;
+    font-weight: 700;
+    color: #000;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    line-height: 1.1;
+    margin-bottom: 7px;
+  }
+
+  .header-gradient {
+    height: 1.5px;
+    background: var(--rule-color);
+    margin-bottom: 7px;
+  }
+
+  .contact-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    font-size: 10px;
+    line-height: 1.4;
+    color: var(--muted-color);
+  }
+
+  .contact-row .separator {
+    color: #9a9a9a;
+  }
+
+  /* === OPTIONAL PROFILE PHOTO (opt-in, off by default — see base template) === */
+  .cv-photo {
+    float: right;
+    width: 80px;
+    height: 100px;
+    object-fit: cover;
+    margin: 0 0 8px 14px;
+    border: 0.75px solid #111;
+    filter: grayscale(1);
+  }
+
+  .cv-photo--rounded { border-radius: 6px; }
+  .cv-photo--circle { border-radius: 50%; aspect-ratio: 1; height: 80px; }
+  .cv-photo--square { border-radius: 0; aspect-ratio: 1; height: 80px; }
+
+  /* === SECTIONS === */
+  .section {
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-family: var(--font-family);
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: #000;
+    border-bottom: 0.75px solid var(--rule-color);
+    padding-bottom: 3px;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  /* === PROFESSIONAL SUMMARY === */
+  .summary-text {
+    line-height: 1.6;
+    color: var(--text-color);
+  }
+
+  .summary-text strong {
+    font-weight: 700;
+    color: #000;
+  }
+
+  /* === CORE COMPETENCIES === */
+  .competencies-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .competency-tag {
+    font-size: 9.5px;
+    font-weight: 500;
+    color: #111;
+    background: #ffffff;
+    padding: 2px 7px;
+    border: 0.75px solid #8a8a8a;
+    border-radius: 0;
+  }
+
+  /* === WORK EXPERIENCE === */
+  .job {
+    margin-bottom: 11px;
+  }
+
+  .job-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 1px;
+  }
+
+  .job-company {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #000;
+  }
+
+  .job-period {
+    font-size: 10px;
+    color: var(--muted-color);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .job-role {
+    font-size: 10.5px;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--text-color);
+    margin-bottom: 1px;
+  }
+
+  .job-location {
+    font-size: 9.5px;
+    color: var(--muted-color);
+  }
+
+  .job ul {
+    padding-left: 15px;
+    margin-top: 4px;
+  }
+
+  .job li {
+    font-size: 10.5px;
+    line-height: 1.5;
+    color: var(--text-color);
+    margin-bottom: 3px;
+  }
+
+  .job li::marker {
+    color: #000;
+  }
+
+  .job li strong {
+    font-weight: 700;
+    color: #000;
+  }
+
+  /* === PROJECTS === */
+  .project {
+    margin-bottom: 9px;
+  }
+
+  .project-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #000;
+  }
+
+  .project-title a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .project-badge {
+    font-size: 8px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #111;
+    background: none;
+    border: 0.75px solid #111;
+    padding: 0 5px;
+    margin-left: 7px;
+    vertical-align: 1px;
+  }
+
+  .project-desc {
+    font-size: 10.5px;
+    color: var(--text-color);
+    margin-top: 2px;
+    line-height: 1.5;
+  }
+
+  .project-tech {
+    font-size: 9.5px;
+    color: var(--muted-color);
+    margin-top: 2px;
+  }
+
+  /* === EDUCATION === */
+  .edu-item {
+    margin-bottom: 6px;
+  }
+
+  .edu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  .edu-title {
+    font-weight: 700;
+    color: #000;
+  }
+
+  .edu-org {
+    color: var(--text-color);
+    font-weight: 400;
+  }
+
+  .edu-year {
+    font-size: 10px;
+    color: var(--muted-color);
+    white-space: nowrap;
+  }
+
+  .edu-location {
+    font-size: 9.5px;
+    color: var(--muted-color);
+  }
+
+  .edu-desc {
+    font-size: 10px;
+    color: var(--muted-color);
+    margin-top: 2px;
+    line-height: 1.5;
+  }
+
+  /* === CERTIFICATIONS / AWARDS === */
+  .cert-table,
+  .award-table {
+    display: table;
+    width: 100%;
+  }
+
+  .cert-item,
+  .award-item {
+    display: table-row;
+  }
+
+  .cert-item > *,
+  .award-item > * {
+    display: table-cell;
+    vertical-align: baseline;
+    padding-bottom: 5px;
+  }
+
+  .cert-title,
+  .award-title {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #000;
+  }
+
+  .cert-org,
+  .award-org {
+    color: var(--text-color);
+    white-space: nowrap;
+  }
+
+  .cert-year,
+  .award-year {
+    font-size: 10px;
+    color: var(--muted-color);
+    white-space: nowrap;
+    text-align: right;
+    width: 44px;
+  }
+
+  /* === INTERESTS === */
+  .interests-line {
+    font-size: 10.5px;
+    color: var(--text-color);
+  }
+
+  /* === SKILLS === */
+  .skills-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .skill-item {
+    font-size: 10.5px;
+    color: var(--text-color);
+  }
+
+  .skill-category {
+    font-weight: 700;
+    color: #000;
+  }
+
+  /* === PRINT === */
+  @media print {
+    body {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* Keep a small right gutter for the print box. Right-aligned content
+       (job periods, education years) right-aligns to the content-box edge,
+       and the rightmost glyph's side bearing can spill ~1px past it and get
+       clipped by Chromium's print clip. A plain `.page` padding is reset to 0
+       here for print, which is why padding set outside @media print has no
+       effect; restoring a right gutter inside the print rule fixes it without
+       re-centering the page or hard-coding a per-format max-width. See #1341. */
+    .page {
+      padding: 0 0.18in 0 0;
+    }
+  }
+
+  /* === PAGE BREAK CONTROL === */
+  /* Only avoid breaking small atomic units (a cert row, an education line, the
+     header, a single competency or skill).  Sections and multi-bullet roles are
+     allowed to flow across a page boundary so content packs tight instead of
+     jumping wholesale and leaving large bottom gaps. */
+  .header,
+  .edu-item,
+  .cert-item,
+  .competency-tag,
+  .skill-item {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Keep a heading attached to the content that follows it, so headings are not
+     orphaned at the bottom of a page. */
+  .section-title,
+  .job-company,
+  .job-role,
+  .job-location,
+  .edu-location,
+  .project-title {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  /* Keep a project's tech line attached to the description above it.  A project
+     may still split across pages, but not at the one opportunity that strands a
+     bare "Python | github.com/..." line at the top of the next page with no
+     title or description to identify it. */
+  .project-tech {
+    break-before: avoid;
+    page-break-before: avoid;
+  }
+
+  /* === RTL (Arabic) Support === */
+  html[lang="ar"] body {
+    direction: rtl;
+    text-align: right;
+    font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+  }
+
+  html[lang="ar"] .header h1,
+  html[lang="ar"] .section-title,
+  html[lang="ar"] .job-company,
+  html[lang="ar"] .project-title,
+  html[lang="ar"] .competency-tag,
+  html[lang="ar"] .skill-category {
+    font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+  }
+
+
+  html[lang="ar"] .job ul {
+    padding-right: 18px;
+    padding-left: 0;
+  }
+
+  html[lang="ar"] .project-badge {
+    margin-right: 6px;
+    margin-left: 0;
+  }
+
+  html[lang="ar"] .cert-year {
+    text-align: left;
+  }
+
+  html[lang="ar"] .cert-table {
+    direction: rtl;
+  }
+
+  html[lang="ar"] .cv-photo {
+    float: left;
+    margin: 0 14px 8px 0;
+  }
+
+  /* === CJK (Japanese) font fallback === */
+  /* The bundled webfonts are Latin-only (see #951). Without a CJK fallback,
+     Japanese text renders as tofu (□) in headless Chromium on any system
+     without a CJK system font (Linux/CI, minimal containers). The Latin brand
+     fonts are kept first so ASCII still uses Space Grotesk / DM Sans, then the
+     browser's per-glyph fallback picks the first installed CJK face for kana
+     and kanji. Mirrors the lang="ar" precedent above. */
+  html[lang="ja"] body {
+    font-family: var(--font-family), 'Hiragino Sans',
+      'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'YuGothic', 'Noto Sans CJK JP',
+      'Noto Sans JP', Meiryo, 'MS PGothic', sans-serif;
+  }
+
+  html[lang="ja"] .header h1,
+  html[lang="ja"] .section-title,
+  html[lang="ja"] .job-company,
+  html[lang="ja"] .project-title,
+  html[lang="ja"] .competency-tag,
+  html[lang="ja"] .skill-category {
+   font-family: var(--font-family), 'Hiragino Sans', 'Hiragino Kaku Gothic ProN',
+      'Yu Gothic', 'YuGothic', 'Noto Sans CJK JP', 'Noto Sans JP',
+      Meiryo, 'MS PGothic', sans-serif;
+  }
+
+  /* === Simplified Chinese typography ===
+     Keep Latin-capable system fonts first for stable ATS extraction, then use
+     platform-native and open-source Simplified Chinese faces for Han glyphs.
+     Explicit line-breaking prevents mixed Chinese/English tokens and Chinese
+     punctuation from producing clipped or awkward PDF lines. */
+  html[lang="zh-CN"] body,
+  html[lang="zh"] body {
+    font-family: var(--font-family), 'PingFang SC',
+      'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC',
+      'Noto Sans SC', 'Source Han Sans SC', sans-serif;
+    line-break: strict;
+    word-break: normal;
+    overflow-wrap: break-word;
+  }
+
+  html[lang="zh-CN"] .header h1,
+  html[lang="zh-CN"] .section-title,
+  html[lang="zh-CN"] .job-company,
+  html[lang="zh-CN"] .project-title,
+  html[lang="zh-CN"] .contact-row,
+  html[lang="zh-CN"] .competency-tag,
+  html[lang="zh-CN"] .skill-category,
+  html[lang="zh"] .header h1,
+  html[lang="zh"] .section-title,
+  html[lang="zh"] .job-company,
+  html[lang="zh"] .project-title,
+  html[lang="zh"] .contact-row,
+  html[lang="zh"] .competency-tag,
+  html[lang="zh"] .skill-category {
+    font-family: var(--font-family), 'PingFang SC',
+      'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC',
+      'Noto Sans SC', 'Source Han Sans SC', sans-serif;
+  }
+
+  /* === Korean typography ===
+     modes/ko/ ships as a supported locale, but no rule matched html[lang="ko"],
+     so a Korean CV fell back to the Latin-only stack and Hangul rendered via
+     whatever the PDF engine happened to substitute. Same shape as the ja and
+     zh blocks above: Latin-capable faces first for stable ATS extraction, then
+     platform-native and open-source Korean faces for Hangul glyphs. */
+  html[lang="ko"] body {
+    font-family: var(--font-family), 'Apple SD Gothic Neo',
+      'Malgun Gothic', 'Noto Sans CJK KR',
+      'Noto Sans KR', 'Nanum Gothic', sans-serif;
+    line-break: strict;
+    word-break: normal;
+    overflow-wrap: break-word;
+  }
+
+  html[lang="ko"] .header h1,
+  html[lang="ko"] .section-title,
+  html[lang="ko"] .job-company,
+  html[lang="ko"] .project-title,
+  html[lang="ko"] .contact-row,
+  html[lang="ko"] .competency-tag,
+  html[lang="ko"] .skill-category {
+    font-family: var(--font-family), 'Apple SD Gothic Neo',
+      'Malgun Gothic', 'Noto Sans CJK KR',
+      'Noto Sans KR', 'Nanum Gothic', sans-serif;
+  }
+
+  /* === Traditional Chinese typography ===
+     modes/zh-TW/ ships as a supported locale. html[lang="zh"] does not match
+     lang="zh-TW", so it needs its own rule — and it must use TC faces, not the
+     Simplified stack above, which substitutes the wrong glyph forms.
+     var(--font-family) leads (profile override / Latin :root default), then the
+     TC faces sit in the font list itself — NOT in var()'s fallback slot, which
+     is dead because :root always defines --font-family. Same shape as
+     templates/ats/cv-template.ats.html. (The ja/zh-CN/ko blocks above still use
+     the older `var(--font-family, …)` form and have the same dead-slot bug —
+     out of scope here, tracked separately.) */
+  html[lang="zh-TW"] body {
+    font-family: var(--font-family), 'PingFang TC',
+      'Microsoft JhengHei', 'Noto Sans CJK TC',
+      'Noto Sans TC', 'Source Han Sans TC', sans-serif;
+    line-break: strict;
+    word-break: normal;
+    overflow-wrap: break-word;
+  }
+
+  html[lang="zh-TW"] .header h1,
+  html[lang="zh-TW"] .section-title,
+  html[lang="zh-TW"] .job-company,
+  html[lang="zh-TW"] .project-title,
+  html[lang="zh-TW"] .contact-row,
+  html[lang="zh-TW"] .competency-tag,
+  html[lang="zh-TW"] .skill-category {
+    font-family: var(--font-family), 'PingFang TC',
+      'Microsoft JhengHei', 'Noto Sans CJK TC',
+      'Noto Sans TC', 'Source Han Sans TC', sans-serif;
+  }
+
+  html[lang="zh-CN"] .summary-text,
+  html[lang="zh"] .summary-text,
+  html[lang="zh-CN"] .job li,
+  html[lang="zh"] .job li {
+    line-height: 1.7;
+  }
+
+  html[lang="zh-CN"] .section-title,
+  html[lang="zh"] .section-title {
+    letter-spacing: 0.03em;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  {{PHOTO}}
+  <!-- HEADER -->
+  <div class="header">
+    <h1>{{NAME}}</h1>
+    <div class="header-gradient"></div>
+    <div class="contact-row">
+      <a href="tel:{{PHONE}}">{{PHONE}}</a>
+      <span class="separator">|</span>
+      <a href="mailto:{{EMAIL}}">{{EMAIL}}</a>
+      <span class="separator">|</span>
+      <a href="{{LINKEDIN_URL}}">{{LINKEDIN_DISPLAY}}</a>
+      <span class="separator">|</span>
+      <a href="{{PORTFOLIO_URL}}">{{PORTFOLIO_DISPLAY}}</a>
+      <span class="separator">|</span>
+      <span>{{LOCATION}}</span>
+    </div>
+  </div>
+
+  <!-- PROFESSIONAL SUMMARY -->
+  <div class="section">
+    <div class="section-title">{{SECTION_SUMMARY}}</div>
+    <div class="summary-text">{{SUMMARY_TEXT}}</div>
+  </div>
+
+  <!-- CORE COMPETENCIES -->
+  <div class="section">
+    <div class="section-title">{{SECTION_COMPETENCIES}}</div>
+    <div class="competencies-grid">
+      {{COMPETENCIES}}
+    </div>
+  </div>
+
+  <!-- WORK EXPERIENCE -->
+  <div class="section">
+    <div class="section-title">{{SECTION_EXPERIENCE}}</div>
+    {{EXPERIENCE}}
+  </div>
+
+  <!-- PROJECTS -->
+  <div class="section">
+    <div class="section-title">{{SECTION_PROJECTS}}</div>
+    {{PROJECTS}}
+  </div>
+
+  <!-- EDUCATION -->
+  <div class="section">
+    <div class="section-title">{{SECTION_EDUCATION}}</div>
+    {{EDUCATION}}
+  </div>
+
+  <!-- CERTIFICATIONS -->
+  <div class="section">
+    <div class="section-title">{{SECTION_CERTIFICATIONS}}</div>
+    <div class="cert-table">{{CERTIFICATIONS}}</div>
+  </div>
+
+  <!-- AWARDS -->
+  <div class="section">
+    <div class="section-title">{{SECTION_AWARDS}}</div>
+    <div class="award-table">{{AWARDS}}</div>
+  </div>
+
+  <!-- INTERESTS -->
+  <div class="section">
+    <div class="section-title">{{SECTION_INTERESTS}}</div>
+    <div class="interests-line">{{INTERESTS}}</div>
+  </div>
+
+  <!-- SKILLS -->
+  <div class="section">
+    <div class="section-title">{{SECTION_SKILLS}}</div>
+    {{SKILLS}}
+  </div>
+
+  <!-- END -->
+
+</div>
+</body>
+</html>

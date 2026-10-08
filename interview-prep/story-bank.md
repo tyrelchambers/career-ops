@@ -66,3 +66,39 @@ This file accumulates your best interview stories over time. Each evaluation (Bl
 **R:** Company-wide adoption; reduced infrastructure overhead for the entire organization.
 **Reflection:** Writing is a forcing function for thinking. Documenting the decision revealed weaknesses in options I'd initially favored.
 **Best for questions about:** "Tell me about a time you influenced without authority", "Tell me about a time you identified and solved a problem proactively", "Tell me about your communication style"
+
+---
+
+### [Performance / Interactive Data Tools] JobWatchCanada: 500K Points in the Browser
+**Source:** Report #308 — Waabi — Software Engineer, Commercial Software (Tools team)
+**Provenance:** source: cv.md
+**S:** JobWatchCanada needed to show hundreds of thousands of geocoded job-market points in the browser, on top of a Go + React app over millions of records.
+**T:** Keep pan/zoom smooth at that scale without a paid mapping service.
+**A:** Rendered the layer with MapLibre GL; used clustering and tile optimization for the map, and data pagination, caching, and query optimization on the Go + PostgreSQL side so the API kept up.
+**R:** 500,000+ geospatial data points rendered interactively with smooth pan/zoom at scale.
+**Reflection:** The rendering budget, not the framework, was the real constraint. Measure first, then decide what the browser should never receive.
+**Best for questions about:** "Tell me about a performance problem you solved", "Tell me about building a data-heavy UI", "Tell me about a tool you built for a specific set of users"
+
+---
+
+### [Infrastructure / Self-Hosting] Self-Hosted Pelias Geocoding on Kubernetes
+**Source:** Report #308 — Waabi — Software Engineer, Commercial Software (Tools team)
+**Provenance:** source: cv.md
+**S:** JobWatchCanada needed to geocode and reverse-geocode hundreds of thousands of full and partial addresses; a hosted geocoding API at that volume was not viable for a solo product.
+**T:** Run geocoding in-house, reliably, on infrastructure I already operated.
+**A:** Deployed a self-hosted Pelias geocoding server with multiple dataset integrations, alongside the Kubernetes stack I maintain for the product.
+**R:** Reverse-geocoded hundreds of thousands of addresses at scale as part of the data pipeline.
+**Reflection:** Operating your own infrastructure teaches you exactly which parts are worth paying someone else to run.
+**Best for questions about:** "Tell me about your cloud/infra experience", "Tell me about a time you chose build over buy", "Tell me about running something in production"
+
+---
+
+### [Data Pipelines / Normalization] Government Data Normalization Pipelines
+**Source:** Report #308 — Waabi — Software Engineer, Commercial Software (Tools team)
+**Provenance:** source: cv.md
+**S:** Canadian Open Government datasets arrive in heterogeneous formats and schemas.
+**T:** Turn them into clean, queryable public data the product could render and search.
+**A:** Built parsing and scraping pipelines that normalized the heterogeneous datasets into a consistent schema in PostgreSQL.
+**R:** Millions of Open Government data points processed into a clean, queryable dataset powering the live product.
+**Reflection:** Schema normalization is the unglamorous bulk of any data tool; the UI is only as good as the shape of the data underneath it.
+**Best for questions about:** "Tell me about working with messy data", "Tell me about building a pipeline", "Tell me about dataset curation"

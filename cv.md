@@ -30,7 +30,7 @@ tychambers3@gmail.com - (705) 761-0611 - Peterborough, ON
 **SKILLS**
 
 **Front-end:** React, Next, JavaScript, TypeScript, React-Query, Playwright, Vitest, HTML, CSS, Astro, Sanity, Sentry
-**Back-end:** Go, NestJS, Express.js, PostgreSQL, Socket.io, MongoDB, Stripe SDK, AWS, Docker, Redis, Ruby on Rails
+**Back-end:** Go, Node.js (NestJS, Express.js), PostgreSQL, Socket.io, MongoDB, Stripe SDK, AWS, Docker, Redis
 **Infrastructure:** GitHub Actions, Digital Ocean, Netlify, Vercel, GCP, Traefik, Kubernetes
 **AI:** Claude Code
 

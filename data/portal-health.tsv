@@ -825,3 +825,222 @@ timestamp	company	status
 2026-09-15T16:20:53.889Z	Later	reachable
 2026-09-15T16:20:53.889Z	Unbounce	reachable
 2026-09-15T16:20:53.889Z	Celonis	reachable
+2026-09-15T17:03:19.615Z	1Password	reachable
+2026-09-15T17:03:20.770Z	Fullscript	reachable
+2026-09-15T17:03:21.181Z	Grafana Labs	reachable
+2026-09-15T18:25:14.586Z	Tailscale	reachable
+2026-09-15T18:25:14.586Z	Shopify	reachable
+2026-09-15T18:25:14.586Z	1Password	reachable
+2026-09-15T18:25:14.586Z	Wealthsimple	reachable
+2026-09-15T18:25:14.586Z	Cohere	reachable
+2026-09-15T18:25:14.586Z	Ada	reachable
+2026-09-15T18:25:14.586Z	Hootsuite	reachable
+2026-09-15T18:25:14.586Z	Lightspeed Commerce	reachable
+2026-09-15T18:25:14.586Z	Jobber	reachable
+2026-09-15T18:25:14.586Z	FreshBooks	reachable
+2026-09-15T18:25:14.586Z	Koho Financial	reachable
+2026-09-15T18:25:14.586Z	League	reachable
+2026-09-15T18:25:14.586Z	Klue	reachable
+2026-09-15T18:25:14.586Z	Rewind	reachable
+2026-09-15T18:25:14.586Z	Fullscript	reachable
+2026-09-15T18:25:14.586Z	Benevity	reachable
+2026-09-15T18:25:14.586Z	Dialogue	reachable
+2026-09-15T18:25:14.586Z	Top Hat	reachable
+2026-09-15T18:25:14.586Z	Faire	reachable
+2026-09-15T18:25:14.586Z	PointClickCare	reachable
+2026-09-15T18:25:14.586Z	Jane App	reachable
+2026-09-15T18:25:14.586Z	Wave Financial	reachable
+2026-09-15T18:25:14.586Z	StackAdapt	reachable
+2026-09-15T18:25:14.586Z	Waabi	reachable
+2026-09-15T18:25:14.586Z	HeyGen	reachable
+2026-09-15T18:25:14.586Z	Toast	reachable
+2026-09-15T18:25:14.586Z	Supabase	reachable
+2026-09-15T18:25:14.586Z	Linear	reachable
+2026-09-15T18:25:14.586Z	Figma	network
+2026-09-15T18:25:14.586Z	Notion	reachable
+2026-09-15T18:25:14.586Z	Sentry	reachable
+2026-09-15T18:25:14.586Z	PostHog	reachable
+2026-09-15T18:25:14.586Z	WorkOS	reachable
+2026-09-15T18:25:14.586Z	Retool	reachable
+2026-09-15T18:25:14.586Z	Airtable	reachable
+2026-09-15T18:25:14.586Z	Datadog	reachable
+2026-09-15T18:25:14.586Z	Grafana Labs	reachable
+2026-09-15T18:25:14.586Z	Anthropic	reachable
+2026-09-15T18:25:14.586Z	OpenAI	reachable
+2026-09-15T18:25:14.586Z	Intercom	reachable
+2026-09-15T18:25:14.586Z	Temporal	reachable
+2026-09-15T18:25:14.586Z	Arize AI	reachable
+2026-09-15T18:25:14.586Z	RunPod	reachable
+2026-09-15T18:25:14.586Z	Glean	reachable
+2026-09-15T18:25:14.586Z	Sierra	reachable
+2026-09-15T18:25:14.586Z	Decagon	reachable
+2026-09-15T18:25:14.586Z	Perplexity	reachable
+2026-09-15T18:25:14.586Z	Clay Labs	reachable
+2026-09-15T18:25:14.586Z	Runway	reachable
+2026-09-15T18:25:14.586Z	Hightouch	reachable
+2026-09-15T18:25:14.586Z	Twilio	reachable
+2026-09-15T18:25:14.586Z	Gong	reachable
+2026-09-15T18:25:14.586Z	Genesys	reachable
+2026-09-15T18:25:14.586Z	Langfuse	reachable
+2026-09-15T18:25:14.586Z	Lindy	reachable
+2026-09-15T18:25:14.586Z	LangChain	reachable
+2026-09-15T18:25:14.586Z	Pinecone	reachable
+2026-09-15T18:25:14.586Z	n8n	reachable
+2026-09-15T18:25:14.586Z	Zapier	reachable
+2026-09-15T18:25:14.586Z	Weights & Biases	reachable
+2026-09-15T18:25:14.586Z	Palantir	reachable
+2026-09-15T18:25:14.586Z	Spotify	reachable
+2026-09-15T18:25:14.586Z	Amplitude	reachable
+2026-09-15T18:25:14.586Z	Mixpanel	reachable
+2026-09-15T18:25:14.586Z	LogRocket	reachable
+2026-09-15T18:25:14.586Z	FullStory	reachable
+2026-09-15T18:25:14.586Z	Clerk	reachable
+2026-09-15T18:25:14.586Z	Neon	reachable
+2026-09-15T18:25:14.586Z	Resend	reachable
+2026-09-15T18:25:14.586Z	Later	reachable
+2026-09-15T18:25:14.586Z	Unbounce	reachable
+2026-09-15T18:25:14.586Z	Celonis	reachable
+2026-09-27T13:28:53.801Z	Tailscale	reachable
+2026-09-27T13:28:53.801Z	Shopify	reachable
+2026-09-27T13:28:53.801Z	1Password	reachable
+2026-09-27T13:28:53.801Z	Wealthsimple	reachable
+2026-09-27T13:28:53.801Z	Cohere	reachable
+2026-09-27T13:28:53.801Z	Ada	reachable
+2026-09-27T13:28:53.801Z	Hootsuite	reachable
+2026-09-27T13:28:53.801Z	Lightspeed Commerce	reachable
+2026-09-27T13:28:53.801Z	Jobber	reachable
+2026-09-27T13:28:53.801Z	FreshBooks	reachable
+2026-09-27T13:28:53.801Z	Koho Financial	reachable
+2026-09-27T13:28:53.801Z	League	reachable
+2026-09-27T13:28:53.801Z	Klue	reachable
+2026-09-27T13:28:53.801Z	Rewind	reachable
+2026-09-27T13:28:53.801Z	Fullscript	reachable
+2026-09-27T13:28:53.801Z	Benevity	reachable
+2026-09-27T13:28:53.801Z	Dialogue	reachable
+2026-09-27T13:28:53.801Z	Top Hat	reachable
+2026-09-27T13:28:53.801Z	Faire	reachable
+2026-09-27T13:28:53.801Z	PointClickCare	reachable
+2026-09-27T13:28:53.801Z	Jane App	reachable
+2026-09-27T13:28:53.801Z	Wave Financial	reachable
+2026-09-27T13:28:53.801Z	StackAdapt	reachable
+2026-09-27T13:28:53.801Z	Waabi	reachable
+2026-09-27T13:28:53.801Z	HeyGen	reachable
+2026-09-27T13:28:53.801Z	Toast	reachable
+2026-09-27T13:28:53.801Z	Supabase	reachable
+2026-09-27T13:28:53.801Z	Linear	reachable
+2026-09-27T13:28:53.801Z	Figma	reachable
+2026-09-27T13:28:53.801Z	Notion	reachable
+2026-09-27T13:28:53.801Z	Sentry	reachable
+2026-09-27T13:28:53.801Z	PostHog	reachable
+2026-09-27T13:28:53.801Z	WorkOS	reachable
+2026-09-27T13:28:53.801Z	Retool	reachable
+2026-09-27T13:28:53.801Z	Airtable	reachable
+2026-09-27T13:28:53.801Z	Datadog	reachable
+2026-09-27T13:28:53.801Z	Grafana Labs	reachable
+2026-09-27T13:28:53.801Z	Anthropic	reachable
+2026-09-27T13:28:53.801Z	OpenAI	reachable
+2026-09-27T13:28:53.801Z	Intercom	reachable
+2026-09-27T13:28:53.801Z	Temporal	reachable
+2026-09-27T13:28:53.801Z	Arize AI	reachable
+2026-09-27T13:28:53.801Z	RunPod	reachable
+2026-09-27T13:28:53.801Z	Glean	reachable
+2026-09-27T13:28:53.801Z	Sierra	reachable
+2026-09-27T13:28:53.801Z	Decagon	reachable
+2026-09-27T13:28:53.801Z	Perplexity	reachable
+2026-09-27T13:28:53.801Z	Clay Labs	reachable
+2026-09-27T13:28:53.801Z	Runway	reachable
+2026-09-27T13:28:53.801Z	Hightouch	reachable
+2026-09-27T13:28:53.801Z	Twilio	reachable
+2026-09-27T13:28:53.801Z	Gong	reachable
+2026-09-27T13:28:53.801Z	Genesys	reachable
+2026-09-27T13:28:53.801Z	Langfuse	empty
+2026-09-27T13:28:53.801Z	Lindy	reachable
+2026-09-27T13:28:53.801Z	LangChain	reachable
+2026-09-27T13:28:53.801Z	Pinecone	reachable
+2026-09-27T13:28:53.801Z	n8n	reachable
+2026-09-27T13:28:53.801Z	Zapier	reachable
+2026-09-27T13:28:53.801Z	Weights & Biases	reachable
+2026-09-27T13:28:53.801Z	Palantir	reachable
+2026-09-27T13:28:53.801Z	Spotify	reachable
+2026-09-27T13:28:53.801Z	Amplitude	reachable
+2026-09-27T13:28:53.801Z	Mixpanel	reachable
+2026-09-27T13:28:53.801Z	LogRocket	reachable
+2026-09-27T13:28:53.801Z	FullStory	reachable
+2026-09-27T13:28:53.801Z	Clerk	reachable
+2026-09-27T13:28:53.801Z	Neon	reachable
+2026-09-27T13:28:53.801Z	Resend	reachable
+2026-09-27T13:28:53.801Z	Later	reachable
+2026-09-27T13:28:53.801Z	Unbounce	reachable
+2026-09-27T13:28:53.801Z	Celonis	reachable
+2026-10-08T23:13:27.102Z	Tailscale	reachable
+2026-10-08T23:13:27.102Z	Shopify	reachable
+2026-10-08T23:13:27.102Z	1Password	reachable
+2026-10-08T23:13:27.102Z	Wealthsimple	reachable
+2026-10-08T23:13:27.102Z	Cohere	reachable
+2026-10-08T23:13:27.102Z	Ada	reachable
+2026-10-08T23:13:27.102Z	Hootsuite	reachable
+2026-10-08T23:13:27.102Z	Lightspeed Commerce	reachable
+2026-10-08T23:13:27.102Z	Jobber	reachable
+2026-10-08T23:13:27.102Z	FreshBooks	reachable
+2026-10-08T23:13:27.102Z	Koho Financial	reachable
+2026-10-08T23:13:27.102Z	League	reachable
+2026-10-08T23:13:27.102Z	Klue	reachable
+2026-10-08T23:13:27.102Z	Rewind	reachable
+2026-10-08T23:13:27.102Z	Fullscript	reachable
+2026-10-08T23:13:27.102Z	Benevity	reachable
+2026-10-08T23:13:27.102Z	Dialogue	reachable
+2026-10-08T23:13:27.102Z	Top Hat	reachable
+2026-10-08T23:13:27.102Z	Faire	reachable
+2026-10-08T23:13:27.102Z	PointClickCare	reachable
+2026-10-08T23:13:27.102Z	Jane App	reachable
+2026-10-08T23:13:27.102Z	Wave Financial	reachable
+2026-10-08T23:13:27.102Z	StackAdapt	reachable
+2026-10-08T23:13:27.102Z	Waabi	reachable
+2026-10-08T23:13:27.102Z	HeyGen	reachable
+2026-10-08T23:13:27.102Z	Toast	reachable
+2026-10-08T23:13:27.102Z	Supabase	reachable
+2026-10-08T23:13:27.102Z	Linear	reachable
+2026-10-08T23:13:27.102Z	Figma	reachable
+2026-10-08T23:13:27.102Z	Notion	reachable
+2026-10-08T23:13:27.102Z	Sentry	reachable
+2026-10-08T23:13:27.102Z	PostHog	reachable
+2026-10-08T23:13:27.102Z	WorkOS	reachable
+2026-10-08T23:13:27.102Z	Retool	reachable
+2026-10-08T23:13:27.102Z	Airtable	reachable
+2026-10-08T23:13:27.102Z	Datadog	reachable
+2026-10-08T23:13:27.102Z	Grafana Labs	reachable
+2026-10-08T23:13:27.102Z	Anthropic	reachable
+2026-10-08T23:13:27.102Z	OpenAI	reachable
+2026-10-08T23:13:27.102Z	Intercom	reachable
+2026-10-08T23:13:27.102Z	Temporal	reachable
+2026-10-08T23:13:27.102Z	Arize AI	reachable
+2026-10-08T23:13:27.102Z	RunPod	reachable
+2026-10-08T23:13:27.102Z	Glean	reachable
+2026-10-08T23:13:27.102Z	Sierra	reachable
+2026-10-08T23:13:27.102Z	Decagon	reachable
+2026-10-08T23:13:27.102Z	Perplexity	reachable
+2026-10-08T23:13:27.102Z	Clay Labs	reachable
+2026-10-08T23:13:27.102Z	Runway	reachable
+2026-10-08T23:13:27.102Z	Hightouch	slug_gone
+2026-10-08T23:13:27.102Z	Twilio	reachable
+2026-10-08T23:13:27.102Z	Gong	reachable
+2026-10-08T23:13:27.102Z	Genesys	reachable
+2026-10-08T23:13:27.102Z	Langfuse	empty
+2026-10-08T23:13:27.102Z	Lindy	reachable
+2026-10-08T23:13:27.102Z	LangChain	reachable
+2026-10-08T23:13:27.102Z	Pinecone	reachable
+2026-10-08T23:13:27.102Z	n8n	reachable
+2026-10-08T23:13:27.102Z	Zapier	reachable
+2026-10-08T23:13:27.102Z	Weights & Biases	reachable
+2026-10-08T23:13:27.102Z	Palantir	reachable
+2026-10-08T23:13:27.102Z	Spotify	reachable
+2026-10-08T23:13:27.102Z	Amplitude	slug_gone
+2026-10-08T23:13:27.102Z	Mixpanel	reachable
+2026-10-08T23:13:27.102Z	LogRocket	reachable
+2026-10-08T23:13:27.102Z	FullStory	reachable
+2026-10-08T23:13:27.102Z	Clerk	reachable
+2026-10-08T23:13:27.102Z	Neon	reachable
+2026-10-08T23:13:27.102Z	Resend	reachable
+2026-10-08T23:13:27.102Z	Later	reachable
+2026-10-08T23:13:27.102Z	Unbounce	reachable
+2026-10-08T23:13:27.102Z	Celonis	reachable

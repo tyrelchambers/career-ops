@@ -102,3 +102,63 @@ This file accumulates your best interview stories over time. Each evaluation (Bl
 **R:** Millions of Open Government data points processed into a clean, queryable dataset powering the live product.
 **Reflection:** Schema normalization is the unglamorous bulk of any data tool; the UI is only as good as the shape of the data underneath it.
 **Best for questions about:** "Tell me about working with messy data", "Tell me about building a pipeline", "Tell me about dataset curation"
+
+---
+
+### [Ownership / Measurable Impact] Authentication-Flow Revenue Recovery
+**Source:** Reports #344, #347, #348 (Affirm)
+**Provenance:** source: cv.md
+**S (Situation):** At This Dot, an authentication flow was costing revenue. [Fill in: which product, what users hit.]
+**T (Task):** Make the case for a fix and ship it.
+**A (Action):** Identified the issue, advocated for prioritizing it, and shipped the authentication-flow improvement. [Fill in: what changed, how it was tested and rolled out.]
+**R (Result):** Recovered ~$7,900/year in revenue.
+**Reflection:** [Your words.] Quantifying the loss is what gets a small flow fix prioritized.
+**Best for questions about:** measurable business impact, finding a problem on your own, influence without authority, auth/login UX, conversion
+
+---
+
+### [End-to-End Ownership / Marketing Integrations] DocuSign Maestro: Sole Engineer
+**Source:** Reports #347, #348 (Affirm)
+**Provenance:** source: cv.md
+**S (Situation):** This Dot needed a DocuSign Maestro marketplace integration that syncs contacts with Constant Contact from inside active signing workflows.
+**T (Task):** Build and publish it as the sole engineer.
+**A (Action):** Built the integration end-to-end in Next.js to auto-sync contacts with Constant Contact during active signing workflows.
+**R (Result):** Published on the DocuSign Maestro marketplace.
+**Reflection:** [Your words.] Sole ownership means owning the third-party constraints, edge cases and publishing too.
+**Best for questions about:** a project owned start to finish, working without a team, third-party / marketing API integrations
+
+---
+
+### [Developer Experience / New Platform] Stripe Apps Pre-release + Google Drive App
+**Source:** Reports #338 (Cohere), #350 (Affirm)
+**Provenance:** source: cv.md
+**S (Situation):** Stripe's Apps platform was pre-release, and This Dot was building some of the first apps on it.
+**T (Task):** Ship real apps on the platform while helping validate it.
+**A (Action):** Partnered with Stripe's engineering team to validate the platform pre-release and stress-test the developer experience; built a Google Drive app for Stripe (React, TypeScript, NestJS).
+**R (Result):** The Google Drive app reached 40,000+ installs.
+**Reflection:** [Your words.] Developer-experience problems surface fastest when someone builds a real product on the platform.
+**Best for questions about:** learning a new platform fast, working with an external engineering team, giving feedback on a platform you depend on, shipping web apps
+
+---
+
+### [Production Ownership / Event Volume] Data Mapper for Mailchimp
+**Source:** Report #341 (Sentry)
+**Provenance:** source: cv.md
+**S (Situation):** Data Mapper for Mailchimp, a Stripe app at ~10,000 DAU processing 11M+ Stripe webhook events/month.
+**T (Task):** Own features across product and customer success.
+**A (Action):** Gathered feedback, wrote specs, and prioritized enhancements. [Fill in: one specific enhancement and how it shipped.]
+**R (Result):** [Fill in: outcome of that enhancement.]
+**Reflection:** [Your words.]
+**Best for questions about:** owning a production system, working on a high-volume app, product and customer-success collaboration
+
+---
+
+### [Backend Performance / Data at Scale] JobWatchCanada: Go Service Over Millions of Records
+**Source:** Report #341 (Sentry)
+**Provenance:** source: cv.md
+**S (Situation):** JobWatchCanada's Go + React app serves millions of Open Government data points from PostgreSQL.
+**T (Task):** Keep the app responsive as data volume and traffic grew.
+**A (Action):** Optimized full-stack performance through data pagination, caching, and query optimization.
+**R (Result):** Handles millions of records; the product reached 20K+ visitors in two months.
+**Reflection:** [Your words.]
+**Best for questions about:** performance problems, large datasets, backend systems you designed

@@ -27,6 +27,13 @@ tychambers3@gmail.com - (705) 761-0611 - Peterborough, ON
 - Served as SME for two greenfield apps among the first built on the Stripe Apps platform.
 - Authored a hosting-architecture proposal adopted company-wide, cutting hosting costs by 60%.
 
+**PROJECTS**
+
+**All Systems Nominal** - allsystemsnominal.ca
+*Personal blog (Astro, Sanity)*
+- Wrote the site's Sanity content schemas and custom Sanity plugins that control how images are inlined in posts.
+- Wired Sanity publish webhooks to trigger Astro site builds when a document is published.
+
 **SKILLS**
 
 **Front-end:** React, Next, JavaScript, TypeScript, React-Query, Playwright, Vitest, HTML, CSS, Astro, Sanity, Sentry

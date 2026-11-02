@@ -162,3 +162,12 @@ This file accumulates your best interview stories over time. Each evaluation (Bl
 **R (Result):** Handles millions of records; the product reached 20K+ visitors in two months.
 **Reflection:** [Your words.]
 **Best for questions about:** performance problems, large datasets, backend systems you designed
+
+### [AI-Assisted Development / Code Ownership] JobWatchCanada: Building With AI While Owning the Code
+**Source:** Report #361 — Cohere — Web Developer
+**S (Situation):** JobWatchCanada was built solo, partly as a test of how far AI-assisted programming could go on a real product.
+**T (Task):** Ship features and keep the Kubernetes stack running without losing understanding of the code.
+**A (Action):** Used AI in developing features, maintaining the Kubernetes stack, and debugging, while reviewing and standing behind every change merged.
+**R (Result):** A live product that reached 20K+ visitors in two months with national media coverage.
+**Reflection:** [Your words: when you chose not to lean on the agent.]
+**Best for questions about:** AI coding tools, code ownership, debugging, working fast without losing quality

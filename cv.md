@@ -14,11 +14,13 @@ tychambers3@gmail.com - (705) 761-0611 - Peterborough, ON
 - Implemented AI in developing features, maintaining the Kubernetes stack, and effective debugging
 
 **This Dot** - Remote          Mar 2024 – Present
-*Software Engineer*
+*Customer Success Engineer & Software Engineer*
+- Spearheaded org-wide agentic AI initiatives synchronizing advancements in automated workflows that shaped the company standard.
+- Led the team in AI usage and adoption, which resulted in a 98% time reduction in support ticket triage across AWS, Stripe, Sentry, and GitHub services.
 - Sole engineer on a published DocuSign Maestro marketplace integration, built end-to-end (Next.js) to auto-sync contacts with Constant Contact from inside active signing workflows.
-- Drove feature ownership across product and customer success for Data Mapper for Mailchimp — gathering feedback, writing specs, and prioritizing enhancements for an app at ~10,000 DAU processing 11M+ Stripe webhook events/month.
+- Drove feature ownership across product and customer success for Data Mapper for Mailchimp — gathering feedback, writing specs, and prioritizing enhancements for an app at ~45,000 installs processing 25M+ Stripe webhook events/month.
 - Identified, advocated for, and shipped an authentication-flow improvement that recovered ~$7,900/year in revenue.
-- Implemented new features in the Stripe app ecosystem to improve the user experience of Data Mapper – providing clarity, customization, and a positive user experience
+- Implemented new features in the Stripe app ecosystem to improve the user experience of Data Mapper, providing clarity and customization, which increased customer retention and satisfaction.
 
 **This Dot** - Remote          Sept 2021 – Sept 2023
 *Software Engineer*
@@ -37,9 +39,9 @@ tychambers3@gmail.com - (705) 761-0611 - Peterborough, ON
 **SKILLS**
 
 **Front-end:** React, Next, JavaScript, TypeScript, React-Query, Playwright, Vitest, HTML, CSS, Astro, Sanity, Sentry
-**Back-end:** Go, Node.js (NestJS, Express.js), PostgreSQL, Socket.io, MongoDB, Stripe SDK, AWS, Docker, Redis
-**Infrastructure:** GitHub Actions, Digital Ocean, Netlify, Vercel, GCP, Traefik, Kubernetes
-**AI:** Claude Code
+**Back-end:** Go, Node.js (NestJS, Express.js), PostgreSQL, MySQL, Socket.io, MongoDB, Stripe SDK, AWS, Docker, Redis
+**Infrastructure:** API development, CI/CD, Linux, GitHub Actions, Digital Ocean, Netlify, Vercel, GCP, Traefik, Kubernetes
+**AI:** Claude Code, Grokbot, Cursor, Codex
 
 **INTERESTS**
 
